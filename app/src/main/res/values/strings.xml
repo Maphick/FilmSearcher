@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Film Searcher</string>
+    <string name="disclaimer">"Картинки взяты с movieposters.com"</string>
+    <string name="menu">"МЕНЮ"</string>
+    <string name="favorites">"ИЗБРАННОЕ"</string>
+    <string name="watch_later">"ПОСМОТРЕТЬ ПОЗЖЕ"</string>
+    <string name="collections">"ПОДБОРКИ"</string>
+    <string name="settings">"НАСТРОЙКИ"</string>
 </resources>
