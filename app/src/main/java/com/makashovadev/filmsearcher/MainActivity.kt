@@ -6,46 +6,72 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.makashovadev.filmsearcher.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+
+    // верхнее меню
+    private lateinit var topAppBar: MaterialToolbar
+
+    // нижнее меню
+    private lateinit var bottom_navigation: BottomNavigationView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        // создание кнопок меню
-        initMenuButtons()
+        // инициализация всех компонентов
+        init()
     }
 
+    // инициализация всех компонентов
+    fun init() {
+        initTopAppBar()
+        initBottomNavigation()
+    }
 
-    // создание кнопок меню
-    fun initMenuButtons() {
-        //  Меню
-        val btn_menu = binding.buttonMenu
-        btn_menu.setOnClickListener {
-            Toast.makeText(this, R.string.menu, Toast.LENGTH_LONG).show()
-        }
-        // Избранное
-        val btn_favorites = binding.buttonFavorites
-        btn_favorites.setOnClickListener {
-            Toast.makeText(this, R.string.favorites, Toast.LENGTH_LONG).show()
-        }
-        // Посмотреть позже
-        val btn_watch_late = binding.buttonWatchLate
-        btn_watch_late.setOnClickListener {
-            Toast.makeText(this, R.string.watch_later, Toast.LENGTH_LONG).show()
-        }
-        // Подборки
-        val btn_collections = binding.buttonCollections
-        btn_collections.setOnClickListener {
-            Toast.makeText(this, R.string.collections, Toast.LENGTH_LONG).show()
-        }
-        // Настройки
-        val btn_settings = binding.buttonSettings
-        btn_settings.setOnClickListener {
-            Toast.makeText(this, R.string.settings, Toast.LENGTH_LONG).show()
+    // инициализация верхнего меню
+    fun initTopAppBar() {
+        topAppBar = binding.topAppBar
+        topAppBar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.settings -> {
+                    Toast.makeText(this, "Настройки", Toast.LENGTH_SHORT).show()
+                    true
+                }
+
+                else -> false
+            }
         }
     }
+
+    // инициализация нижнего меню
+    fun initBottomNavigation() {
+        bottom_navigation = binding.bottomNavigation
+        bottom_navigation.setOnNavigationItemSelectedListener {
+
+            when (it.itemId) {
+                R.id.favorites -> {
+                    Toast.makeText(this, "Избранное", Toast.LENGTH_SHORT).show()
+                    true
+                }
+
+                R.id.watch_later -> {
+                    Toast.makeText(this, "Посмотреть похже", Toast.LENGTH_SHORT).show()
+                    true
+                }
+
+                R.id.selections -> {
+                    Toast.makeText(this, "Подборки", Toast.LENGTH_SHORT).show()
+                    true
+                }
+
+                else -> false
+            }
+        }
+    }
+
 }
