@@ -6,4 +6,9 @@
     <string name="watch_later">"ПОСМОТРЕТЬ ПОЗЖЕ"</string>
     <string name="collections">"ПОДБОРКИ"</string>
     <string name="settings">"НАСТРОЙКИ"</string>
+    <string name="menu_favorites_title">Избранное</string>
+    <string name="menu_watch_later_title">Смотреть позже</string>
+    <string name="menu_selections_title">Подборки</string>
+    <string name="menu_settings_title">Настройки</string>
+    <string name="page_title">Film search</string>
 </resources>

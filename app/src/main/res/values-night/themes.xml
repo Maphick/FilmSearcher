@@ -1,7 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.FilmSearcher" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    <style name="Base.Theme.FilmSearcher" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="colorPrimary">#9C27B0</item>
+        <item name="colorPrimaryDark">#673AB7</item>
+        <item name="colorAccent">#8BC34A</item>
+        <item name="colorSecondary">#CC7290</item>
+        <item name="colorOnBackground">#F4A6C0</item>
+        <item name="colorBackgroundFloating">#610222</item>
+    </style>
+
+    <style name="MyThemeOverlay_Toolbar" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
+        <!-- color used by navigation icon and overflow icon -->
+        <item name="colorOnPrimary">?colorOnBackground</item>
     </style>
 </resources>
