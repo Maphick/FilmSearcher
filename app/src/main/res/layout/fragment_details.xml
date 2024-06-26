@@ -55,23 +55,9 @@
         android:tint="@android:color/white"/>
 
 
-        <include
-            android:id="@+id/nested_scroll_view"
-            layout="@layout/content_scrolling" />
+    <include
+        android:id="@+id/nested_scroll_view"
+        layout="@layout/content_scrolling" />
 
-
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?colorPrimary"
-        app:itemIconTint="?colorOnBackground"
-        app:itemTextColor="?colorOnBackground"
-        app:layout_anchor="@id/nested_scroll_view"
-        app:layout_anchorGravity="bottom"
-        app:labelVisibilityMode="labeled"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/navigation_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

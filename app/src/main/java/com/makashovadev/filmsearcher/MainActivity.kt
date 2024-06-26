@@ -11,9 +11,12 @@ import android.os.Handler
 import android.view.View
 import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
+import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -33,156 +36,76 @@ import com.makashovadev.filmsearcher.presentation.FilmListRecyclerAdapter
 import com.makashovadev.filmsearcher.touch_helper.SimpleItemTouchHelperCallback
 
 class MainActivity : AppCompatActivity() {
-    private val repository = Repository()
+    //private val repository = Repository()
     private lateinit var binding: ActivityMainBinding
-    private lateinit var container: LinearLayout
-    private lateinit var imageView1: ImageView
-    private lateinit var imageView2: ImageView
-    private lateinit var imageView3: ImageView
-    private lateinit var imageView4: ImageView
-    private lateinit var imageView5: ImageView
-
-    //
-    private lateinit var main_recycler: RecyclerView
-    private lateinit var filmsAdapter: FilmListRecyclerAdapter
+    private lateinit var fragment_placeholder: FrameLayout
 
     // верхнее меню
     private lateinit var topAppBar: MaterialToolbar
 
     // нижнее меню
     private lateinit var bottom_navigation: BottomNavigationView
+
+    // при нажатии кнопки  "назад"
+
+    /*override fun onBackPressed() {
+        super.onBackPressed()
+        //BuildAlertDialog()
+    }*/
+
+
+    fun BuildAlertDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Вы хотите выйти?")
+            .setIcon(R.drawable.baseline_menu_24)
+            .setPositiveButton("Да") { _, _ ->
+                finish()
+            }
+            .setNegativeButton("Нет") { _, _ ->
+
+            }
+            .setNeutralButton("Не знаю") { _, _ ->
+                Toast.makeText(this, "Решайся", Toast.LENGTH_SHORT).show()
+            }
+            .setMessage("Нам не хотелось бы, чтобы вы уходили")
+            .setView(EditText(this))
+            .show()
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        // инициализация всех компонентов
-        init()
-        initRV()
-        RecyclerViewSetScroollListener()
-        setUpperPosterAnimator()
-    }
-
-    // инициализация всех компонентов
-    fun init() {
+        fragment_placeholder = binding.fragmentPlaceholder
         initTopAppBar()
+        // инициализация нижнего меню
         initBottomNavigation()
-        container = binding.container
-        imageView1 = binding.imageView1
-        imageView2 = binding.imageView2
-        imageView3 = binding.imageView3
-        imageView4 = binding.imageView4
-        imageView5 = binding.imageView5
+        //Запускаем фрагмент при старте
+        supportFragmentManager
+            .beginTransaction()
+            .add(fragment_placeholder.id, HomeFragment())
+            .addToBackStack(null)
+            .commit()
     }
 
-    // инициализация Recycler View
-    // и применение настроек
-    fun initRV() {
-        //находим наш RV
-        main_recycler = binding.mainRecycler
-        main_recycler.apply {
-            //Инициализируем наш адаптер в конструктор передаем анонимно инициализированный интерфейс,
-            //оставим его пока пустым, он нам понадобится во второй части задания
-            filmsAdapter =
-                FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
-                    override fun click(film: Film) {
-                        //Создаем бандл и кладем туда объект с данными фильма
-                        val bundle = Bundle()
-                        //Первым параметром указывается ключ, по которому потом будем искать, вторым сам
-                        //передаваемый объект
-                        bundle.putParcelable("film", film)
-                        //Запускаем наше активити
-                        val intent = Intent(this@MainActivity, DetailsActivity::class.java)
-                        //Прикрепляем бандл к интенту
-                        intent.putExtras(bundle)
-                        //Запускаем активити через интент
-                        startActivity(intent)
-                    }
-                })
-            //Присваиваем адаптер
-            adapter = filmsAdapter
-            //Присвои layoutmanager
-            layoutManager = LinearLayoutManager(this@MainActivity)
+    fun launchDetailsFragment(film: Film) {
+        //Создаем "посылку"
+        val bundle = Bundle()
+        //Кладем наш фильм в "посылку"
+        bundle.putParcelable("film", film)
+        //Кладем фрагмент с деталями в перменную
+        val fragment = DetailsFragment()
+        //Прикрепляем нашу "посылку" к фрагменту
+        fragment.arguments = bundle
 
-            //Применяем декоратор для отступов
-            val topSpacingDecorator = TopSpacingItemDecoration(8)
-            addItemDecoration(topSpacingDecorator)
-
-
-            // применяем декоратор для пагинации
-            val paginationItemDecoration = PaginationLoadingDecoration()
-            addItemDecoration(paginationItemDecoration)
-
-            //  Этот класс сам определит на каком элементе остановилось пролистывание и доведет до
-            //  ближайшего элемента, чтобы его было полностью видно.
-            val linearSnapHelper = LinearSnapHelper()
-            linearSnapHelper.attachToRecyclerView(this)
-
-            // swipe + drag&drop
-            val callback = SimpleItemTouchHelperCallback(this.adapter as FilmListRecyclerAdapter)
-            val touchHelper = ItemTouchHelper(callback)
-            touchHelper.attachToRecyclerView(this)
-        }
-
-
-        //Кладем нашу БД в RV
-        downloadFirstPage()
-    }
-
-    fun RecyclerViewSetScroollListener() {
-        var isLoading = false
-        val scrollListener = object : RecyclerView.OnScrollListener() {
-            @Override
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val layoutManager = recyclerView.layoutManager as RecyclerView.LayoutManager
-                //смотрим сколько элементов на экране
-                val visibleItemCount: Int = layoutManager.childCount
-                //сколько всего элементов
-                val totalItemCount: Int = layoutManager.itemCount
-
-                //какая позиция первого элемента
-                val firstVisibleItems =
-                    (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                //проверяем, грузим мы что-то или нет
-                if (!isLoading) {
-                    if (visibleItemCount + firstVisibleItems >= totalItemCount) {
-                        //ставим флаг, что мы попросили еще элементы
-                        isLoading = true
-                        //Вызывает загрузку данных в RecyclerView
-                        val newList = downloadAnyPage()
-                        // задержка для демонстрации загрузки
-                        Handler().postDelayed({
-                            // Оповещение RecyclerView об изменении данных с помощью DiffUtil.
-                            updateData(newList, filmsAdapter)
-                            isLoading = false
-                        }, 2000)
-                    }
-
-                }
-            }
-        }
-        main_recycler.setOnScrollListener(scrollListener)
-    }
-
-
-    // загрузка первой страницы
-    fun downloadFirstPage() {
-        // add first page
-        val addedList = repository.firstPage()
-        val newList = arrayListOf<Film>()
-        newList.addAll(filmsAdapter.getItems())
-        newList.addAll(addedList)
-        updateData(newList, filmsAdapter)
-    }
-
-    // загрузка страницы
-    fun downloadAnyPage(): ArrayList<Film> {
-        // add not first page
-        val addedList = repository.nextPage()
-        val newList = arrayListOf<Film>()
-        newList.addAll(filmsAdapter.getItems())
-        newList.addAll(addedList)
-        return newList
+        //Запускаем фрагмент
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_placeholder, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
 
@@ -200,6 +123,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 
     // инициализация нижнего меню
     fun initBottomNavigation() {
@@ -227,23 +151,5 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // анисация нажатия на один из верхних постеров
-    fun setUpperPosterAnimator() {
-        imageView1.setOnClickListener {
-            objectAnimatorTranslationAnim(imageView1)
-        }
-        imageView2.setOnClickListener {
-            objectAnimatorScaleAnim(imageView2)
-        }
-        imageView3.setOnClickListener {
-            ViewPropertyAnimation(imageView3)
-        }
-        imageView4.setOnClickListener {
-            ViewPropertyAnimation(imageView4)
-        }
-        imageView5.setOnClickListener {
-            ViewPropertyAnimation(imageView5)
-        }
-    }
 
 }
