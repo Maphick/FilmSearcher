@@ -48,12 +48,17 @@ class MainActivity : AppCompatActivity() {
 
     // при нажатии кнопки  "назад"
 
-    /*override fun onBackPressed() {
-        super.onBackPressed()
-        //BuildAlertDialog()
-    }*/
+    override fun onBackPressed() {
+        // если это последний экран
+        if (supportFragmentManager.backStackEntryCount == 1) {
+            // то вызывается алерт диалог
+            BuildAlertDialog()
+        } else {
+            super.onBackPressed()
+        }
+    }
 
-
+    // всплывающее меню о том, что пользователь сейчас покинет приложение
     fun BuildAlertDialog() {
         AlertDialog.Builder(this)
             .setTitle("Вы хотите выйти?")
@@ -88,6 +93,8 @@ class MainActivity : AppCompatActivity() {
             .add(fragment_placeholder.id, HomeFragment())
             .addToBackStack(null)
             .commit()
+
+
     }
 
     fun launchDetailsFragment(film: Film) {
