@@ -1,16 +1,20 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.FilmSearcher" parent="Theme.MaterialComponents.Light.DarkActionBar">
-        <item name="colorPrimary">#AD67B9</item>
-        <item name="colorPrimaryDark">#9780C0</item>
-        <item name="colorAccent">#8BC34A</item>
-        <item name="colorSecondary">#CC7290</item>
-        <item name="colorOnBackground">#F3B8CC</item>
-        <item name="colorBackgroundFloating">#CE3C6D</item>
-    </style>
 
-    <style name="MyThemeOverlay_Toolbar" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
-        <!-- color used by navigation icon and overflow icon -->
+    <!--style name="Base.Theme.FilmSearcher" parent="Theme.MaterialComponents.Light.DarkActionBar" -->
+   <!--style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar"-->
+    <style name="Base.Theme.FilmSearcher" parent="Theme.MaterialComponents.NoActionBar">
+    <!--.Light.DarkActionBar" -->
+       <item name="colorPrimary">#AD67B9</item>
+       <item name="colorPrimaryDark">#9780C0</item>
+       <item name="colorAccent">#8BC34A</item>
+       <item name="colorSecondary">#CC7290</item>
+       <item name="colorOnBackground">#F3B8CC</item>
+       <item name="colorBackgroundFloating">#CE3C6D</item>
+   </style>
+
+   <style name="MyThemeOverlay_Toolbar" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
+       <!-- color used by navigation icon and overflow icon -->
         <item name="colorOnPrimary">?colorOnBackground</item>
     </style>
 </resources>

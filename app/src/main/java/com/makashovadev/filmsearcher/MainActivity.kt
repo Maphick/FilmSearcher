@@ -4,52 +4,108 @@ import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.animation.LayoutTransition
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
+import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.makashovadev.filmsearcher.data.dto.Film
+import com.makashovadev.filmsearcher.data.repository.Repository
 import com.makashovadev.filmsearcher.databinding.ActivityMainBinding
+import com.makashovadev.filmsearcher.decorator.PaginationLoadingDecoration
+import com.makashovadev.filmsearcher.decorator.TopSpacingItemDecoration
+import com.makashovadev.filmsearcher.diff_util.FilmDiff
+import com.makashovadev.filmsearcher.diff_util.updateData
+import com.makashovadev.filmsearcher.presentation.FilmListRecyclerAdapter
+import com.makashovadev.filmsearcher.touch_helper.SimpleItemTouchHelperCallback
 
 class MainActivity : AppCompatActivity() {
+    //private val repository = Repository()
     private lateinit var binding: ActivityMainBinding
-    private lateinit var container: LinearLayout
-    private lateinit var imageView1: ImageView
-    private lateinit var imageView2: ImageView
-    private lateinit var imageView3: ImageView
-    private lateinit var imageView4: ImageView
-    private lateinit var imageView5: ImageView
+    private lateinit var fragment_placeholder: FrameLayout
 
     // верхнее меню
     private lateinit var topAppBar: MaterialToolbar
 
     // нижнее меню
     private lateinit var bottom_navigation: BottomNavigationView
+
+    // при нажатии кнопки  "назад"
+
+    /*override fun onBackPressed() {
+        super.onBackPressed()
+        //BuildAlertDialog()
+    }*/
+
+
+    fun BuildAlertDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Вы хотите выйти?")
+            .setIcon(R.drawable.baseline_menu_24)
+            .setPositiveButton("Да") { _, _ ->
+                finish()
+            }
+            .setNegativeButton("Нет") { _, _ ->
+
+            }
+            .setNeutralButton("Не знаю") { _, _ ->
+                Toast.makeText(this, "Решайся", Toast.LENGTH_SHORT).show()
+            }
+            .setMessage("Нам не хотелось бы, чтобы вы уходили")
+            .setView(EditText(this))
+            .show()
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        // инициализация всех компонентов
-        init()
-        setUpperPosterAnimator()
+        fragment_placeholder = binding.fragmentPlaceholder
+        initTopAppBar()
+        // инициализация нижнего меню
+        initBottomNavigation()
+        //Запускаем фрагмент при старте
+        supportFragmentManager
+            .beginTransaction()
+            .add(fragment_placeholder.id, HomeFragment())
+            .addToBackStack(null)
+            .commit()
     }
 
-    // инициализация всех компонентов
-    fun init() {
-        initTopAppBar()
-        initBottomNavigation()
-        container = binding.container
-        imageView1 = binding.imageView1
-        imageView2 = binding.imageView2
-        imageView3 = binding.imageView3
-        imageView4 = binding.imageView4
-        imageView5 = binding.imageView5
+    fun launchDetailsFragment(film: Film) {
+        //Создаем "посылку"
+        val bundle = Bundle()
+        //Кладем наш фильм в "посылку"
+        bundle.putParcelable("film", film)
+        //Кладем фрагмент с деталями в перменную
+        val fragment = DetailsFragment()
+        //Прикрепляем нашу "посылку" к фрагменту
+        fragment.arguments = bundle
+
+        //Запускаем фрагмент
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_placeholder, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
 
@@ -67,6 +123,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 
     // инициализация нижнего меню
     fun initBottomNavigation() {
@@ -94,23 +151,5 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // анисация нажатия на один из верхних постеров
-    fun setUpperPosterAnimator() {
-        imageView1.setOnClickListener {
-            objectAnimatorTranslationAnim(imageView1)
-        }
-        imageView2.setOnClickListener {
-            objectAnimatorScaleAnim(imageView2)
-        }
-        imageView3.setOnClickListener {
-            ViewPropertyAnimation(imageView3)
-        }
-        imageView4.setOnClickListener {
-            ViewPropertyAnimation(imageView4)
-        }
-        imageView5.setOnClickListener {
-            ViewPropertyAnimation(imageView5)
-        }
-    }
 
 }
