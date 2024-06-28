@@ -58,6 +58,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+
     // всплывающее меню о том, что пользователь сейчас покинет приложение
     fun BuildAlertDialog() {
         AlertDialog.Builder(this)
@@ -84,7 +86,7 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
         fragment_placeholder = binding.fragmentPlaceholder
-        initTopAppBar()
+        //initTopAppBar()
         // инициализация нижнего меню
         initBottomNavigation()
         //Запускаем фрагмент при старте
@@ -110,14 +112,14 @@ class MainActivity : AppCompatActivity() {
         //Запускаем фрагмент
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.fragment_placeholder, fragment)
+            .replace(fragment_placeholder.id, fragment)
             .addToBackStack(null)
             .commit()
     }
 
 
     // инициализация верхнего меню
-    fun initTopAppBar() {
+    /*fun initTopAppBar() {
         topAppBar = binding.topAppBar
         topAppBar.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -129,7 +131,7 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
-    }
+    }*/
 
 
     // инициализация нижнего меню
