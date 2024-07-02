@@ -36,8 +36,6 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
         }
     }
 
-    //Этот метод нужно переопределить на возврат количества элементов в списке RV
-    override fun getItemCount() = items.size
 
     //В этом методе мы привязываем наш ViewHolder и передаем туда "надутую" верстку нашего фильма
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -45,6 +43,10 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
         filmBinding = FilmItemBinding.inflate(layoutInflater, parent, false)
         return FilmViewHolder(filmBinding)
     }
+
+
+    //Этот метод нужно переопределить на возврат количества элементов в списке RV
+    override fun getItemCount() = items.size
 
 
     //В этом методе будет привязка полей из объекта Film к View из film_item.xml
