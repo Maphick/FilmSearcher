@@ -1,8 +1,6 @@
-package com.makashovadev.filmsearcher
+package com.makashovadev.filmsearcher.fragments
 
-import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,12 +11,16 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.makashovadev.filmsearcher.MainActivity
+import com.makashovadev.filmsearcher.ViewPropertyAnimation
 import com.makashovadev.filmsearcher.data.dto.Film
 import com.makashovadev.filmsearcher.data.repository.Repository
 import com.makashovadev.filmsearcher.databinding.FragmentHomeBinding
 import com.makashovadev.filmsearcher.decorator.PaginationLoadingDecoration
 import com.makashovadev.filmsearcher.decorator.TopSpacingItemDecoration
 import com.makashovadev.filmsearcher.diff_util.updateData
+import com.makashovadev.filmsearcher.objectAnimatorScaleAnim
+import com.makashovadev.filmsearcher.objectAnimatorTranslationAnim
 import com.makashovadev.filmsearcher.presentation.FilmListRecyclerAdapter
 import com.makashovadev.filmsearcher.touch_helper.SimpleItemTouchHelperCallback
 
@@ -136,11 +138,13 @@ class HomeFragment : Fragment() {
                         //Вызывает загрузку данных в RecyclerView
                         val newList = downloadAnyPage()
                         // задержка для демонстрации загрузки
-                        Handler().postDelayed({
+                        updateData(newList, filmsAdapter)
+                        isLoading = false
+                        /*Handler().postDelayed({
                             // Оповещение RecyclerView об изменении данных с помощью DiffUtil.
                             updateData(newList, filmsAdapter)
                             isLoading = false
-                        }, 2000)
+                        }, 2000)*/
                     }
 
                 }
@@ -149,7 +153,7 @@ class HomeFragment : Fragment() {
         main_recycler.setOnScrollListener(scrollListener)
     }
 
-    // анисация нажатия на один из верхних постеров
+    // анимация нажатия на один из верхних постеров
     fun setUpperPosterAnimator() {
         imageView1.setOnClickListener {
             objectAnimatorTranslationAnim(imageView1)
