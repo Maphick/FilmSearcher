@@ -15,7 +15,17 @@
 
    <style name="MyThemeOverlay_Toolbar" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
        <!-- color used by navigation icon and overflow icon -->
-        <item name="colorOnPrimary">?colorOnBackground</item>
+        <item name="colorOnPrimary">?colorOnPrimary</item>
     </style>
+
+
+    <style name="MyThemeOverlay.SearchView" parent="">
+        <item name="android:editTextColor">@color/colorPrimaryDark</item>
+        <item name="android:textColorHint">?colorBackgroundFloating</item>
+        <item name="colorControlNormal">?colorBackgroundFloating</item>
+    </style>
+
+
+
 </resources>
 

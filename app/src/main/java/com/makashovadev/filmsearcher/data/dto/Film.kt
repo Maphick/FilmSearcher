@@ -5,12 +5,14 @@ import android.os.Parcelable
 
 //@Parcelize
 data class Film(
+    val id: Int,
     val title: String,
     val poster: Int,
     val description: String,
     var isInFavorites: Boolean = false
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
+        parcel.readInt(),
         parcel.readString().toString(),
         parcel.readInt(),
         parcel.readString().toString()
