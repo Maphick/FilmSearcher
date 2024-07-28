@@ -19,14 +19,16 @@ class FilmDiff(val oldList: ArrayList<Film>, val newList: ArrayList<Film>) :
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         val a = oldList[oldItemPosition].hashCode()
         val b = newList[newItemPosition].hashCode()
-        return oldList[oldItemPosition].poster == newList[newItemPosition].poster
+        return oldList[oldItemPosition].id == newList[newItemPosition].id
     }
 
     //Содержимое одинаковое
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         val oldProduct = oldList[oldItemPosition]
         val newProduct = newList[newItemPosition]
-        return oldProduct == newProduct
+        return ((oldProduct.title == newProduct.title) &&
+                (oldProduct.description == newProduct.description) &&
+                (oldProduct.poster == newProduct.poster))
     }
 }
 
