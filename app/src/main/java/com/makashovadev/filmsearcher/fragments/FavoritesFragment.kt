@@ -40,8 +40,6 @@ class FavoritesFragment : Fragment() {
     fun Init(): View? {
         favoritesBinding = FragmentFavoritesBinding.inflate(layoutInflater)
         val view = favoritesBinding.root
-        initRV()
-        //Extras()
         return view
     }
 
@@ -74,6 +72,7 @@ class FavoritesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        initRV()
         super.onViewCreated(view, savedInstanceState)
     }
 

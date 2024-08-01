@@ -6,6 +6,11 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.os.Bundle
 import android.provider.BaseColumns
+import android.transition.Scene
+import android.transition.Slide
+import android.transition.TransitionManager
+import android.transition.TransitionSet
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -17,6 +22,7 @@ import android.widget.LinearLayout
 import androidx.annotation.Nullable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -24,11 +30,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import com.makashovadev.filmsearcher.AnimationHelper
 import com.makashovadev.filmsearcher.MainActivity
 import com.makashovadev.filmsearcher.R
 import com.makashovadev.filmsearcher.data.dto.Film
 import com.makashovadev.filmsearcher.data.repository.Repository
 import com.makashovadev.filmsearcher.databinding.FragmentHomeBinding
+import com.makashovadev.filmsearcher.databinding.MergeHomeScreenContentBinding
 import com.makashovadev.filmsearcher.decorator.PaginationLoadingDecoration
 import com.makashovadev.filmsearcher.decorator.TopSpacingItemDecoration
 import com.makashovadev.filmsearcher.diff_util.updateData
@@ -39,30 +47,78 @@ import java.util.Locale
 
 class HomeFragment : Fragment() {
 
-    private lateinit var homeBinding: FragmentHomeBinding
+    private val binding: FragmentHomeBinding get() = _binding!!
+    private var _binding: FragmentHomeBinding? = null
+    private val myIncludeLayoutBinding: MergeHomeScreenContentBinding get() = _myIncludeLayoutBinding!!
+    private var _myIncludeLayoutBinding: MergeHomeScreenContentBinding? = null
+
+    private lateinit var homeFragmentRoot: ConstraintLayout
+
     private val repository = Repository()
-    private lateinit var main_recycler: RecyclerView
+    private lateinit var mainRecycler: RecyclerView
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
     private lateinit var searchView: SearchView
     private lateinit var mAdapter: SimpleCursorAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        var view: View? = Init()
-        return view
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _myIncludeLayoutBinding = MergeHomeScreenContentBinding.bind(binding.root)
+        return binding.root
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        // myIncludeLayoutBinding.button.setOnClickListener{
+
+        //}
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        _myIncludeLayoutBinding = null
     }
 
 
-    fun Init(): View? {
-        homeBinding = FragmentHomeBinding.inflate(layoutInflater)
-        val view = homeBinding.root
+
+
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        homeFragmentRoot = binding.homeFragmentRoot
+        //находим наш RV
         initRV()
         //RecyclerViewSetScroollListener()
         InitMAdapter()
         initSearchView()
-        return view
+        //Кладем нашу БД в
+        downloadAllPages()
+        //filmsAdapter.addItems(repository.filmsDataBase)
+        //makeAnimation()
+
+        AnimationHelper.performFragmentCircularRevealAnimation(homeFragmentRoot, requireActivity(), 1)
+
+
+
+    }
+
+    fun makeAnimation()
+    {
+        val scene = Scene.getSceneForLayout(homeFragmentRoot, R.layout.merge_home_screen_content, requireContext())
+        //Создаем анимацию выезда поля поиска сверху
+        //val searchSlide = Slide(Gravity.BOTTOM).addTarget(searchView)
+        //Создаем анимацию выезда RV снизу
+        val recyclerSlide = Slide(Gravity.TOP).addTarget(mainRecycler)
+        //Создаем экземпляр TransitionSet, который объединит все наши анимации
+        val customTransition = TransitionSet().apply {
+            //Устанавливаем время, за которое будет проходить анимация
+            duration = 500
+            //Добавляем сами анимации
+            addTransition(recyclerSlide)
+           // addTransition(searchSlide)
+        }
+//Также запускаем через TransitionManager, но вторым параметром передаем нашу кастомную анимацию
+        TransitionManager.go(scene, customTransition)
     }
 
     fun InitMAdapter() {
@@ -79,7 +135,7 @@ class HomeFragment : Fragment() {
     }
 
     fun initSearchView() {
-        searchView = homeBinding.searchView
+        searchView = myIncludeLayoutBinding.searchView
         searchView.setOnClickListener {
             searchView.isIconified = false
         }
@@ -87,86 +143,38 @@ class HomeFragment : Fragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             //Этот метод отрабатывает при нажатии кнопки "поиск" на софт клавиатуре
             override fun onQueryTextSubmit(query: String?): Boolean {
-                setToAdapter(query)
                 return true
             }
 
             //Этот метод отрабатывает на каждое изменения текста
             override fun onQueryTextChange(newText: String): Boolean {
-                pupulateAdapter(newText)
                 //Если ввод пуст то вставляем в адаптер всю БД
-                ifFieldEmpty(newText)
+                if (newText.isEmpty()) {
+                    filmsAdapter.addItems(repository.filmsDataBase)
+                    return true
+                }
+                //Фильтруем список на поискк подходящих сочетаний
+                val result = repository.filmsDataBase.filter {
+                    //Чтобы все работало правильно, нужно и запрос, и имя фильма приводить к нижнему регистру
+                    it.title.toLowerCase(Locale.getDefault())
+                        .contains(newText.toLowerCase(Locale.getDefault()))
+                }
+                //Добавляем в адаптер
+                filmsAdapter.addItems(result)
+                updateData(result as ArrayList, filmsAdapter)
                 return true
             }
         })
-        searchView.suggestionsAdapter = mAdapter
-        searchView.setOnSuggestionListener(object : SearchView.OnSuggestionListener {
-            // когда выбираем предложение
-            override fun onSuggestionSelect(position: Int): Boolean {
-                return true
-            }
 
-            //  когда нажимаем по предложению
-            @SuppressLint("Range")
-            override fun onSuggestionClick(position: Int): Boolean {
-                //  получить айтем адаптера по его позиции
-                val cursor: Cursor = mAdapter.getItem(position) as Cursor
-                // получаем строку из БД в колонке "items"
-                val txt: String = cursor.getString(cursor.getColumnIndex("items"))
-                // устанавливаем текст в searchView
-                //searchView.setQuery(txt, true)
-                searchView.clearFocus()
-                cursor.close()
-                searchView.setQuery(txt, true)
-                //setToAdapter(txt)
-                return true
-            }
-        })
-    }
-
-    fun setToAdapter(newText: String?): Boolean {
-        //Если ввод пуст то вставляем в адаптер всю БД
-        ifFieldEmpty(newText)
-        //Фильтруем список на поиск подходящих сочетаний
-        val result = repository.filmsDataBase.filter {
-            //Чтобы все работало правильно, нужно и запрос, и имя фильма приводить к нижнему регистру
-            it.title.toLowerCase(Locale.getDefault())
-                .contains(newText?.toLowerCase(Locale.getDefault()) ?: "")
-        }
-        //Добавляем в адаптер
-        filmsAdapter.addItems(result)
-        return true
-    }
-
-    fun ifFieldEmpty(newText: String?): Boolean {
-        //Если ввод пуст то вставляем в адаптер всю БД
-        if (newText != null) {
-            if (newText.isEmpty()) {
-                filmsAdapter.addItems(repository.filmsDataBase)
-                return true
-            }
-        }
-        return false
-    }
-
-    //   ф-я берет текст из поля ввода, сравнивает с БД и наполняет адаптер
-    private fun pupulateAdapter(query: String) {
-        val c = MatrixCursor(arrayOf(BaseColumns._ID, "items"))
-        for (i in repository.filmsDataBase.indices) {
-            if (repository.filmsDataBase[i].title.toLowerCase().contains(query.toLowerCase())) {
-                c.addRow(arrayOf(i, repository.filmsDataBase[i].title))
-            }
-        }
-        mAdapter.changeCursor(c)
     }
 
     // инициализация Recycler View
     // и применение настроек
     fun initRV() {
         //находим наш RV
-        main_recycler = homeBinding.mainRecycler
+        mainRecycler = myIncludeLayoutBinding.mainRecycler
         //main_recycler = homeBinding.homeContent.mainRecycler
-        main_recycler.apply {
+        mainRecycler.apply {
             //Инициализируем наш адаптер в конструктор передаем анонимно инициализированный интерфейс,
             //оставим его пока пустым, он нам понадобится во второй части задания
 
@@ -196,7 +204,8 @@ class HomeFragment : Fragment() {
             touchHelper.attachToRecyclerView(this)
         }
         //Кладем нашу БД в RV
-        downloadFirstPage()
+        //downloadFirstPage()
+        //downloadAllPages()
     }
 
 
@@ -204,7 +213,6 @@ class HomeFragment : Fragment() {
     // что вызывает "подгрузку" данных
     // соответственно в адаптер попадают новые подгруженные элементы
     // что делает поиск не релеавнтным
-    /*
     fun RecyclerViewSetScroollListener() {
         var isLoading = false
         val scrollListener = object : RecyclerView.OnScrollListener() {
@@ -239,9 +247,9 @@ class HomeFragment : Fragment() {
                 }
             }
         }
-        main_recycler.setOnScrollListener(scrollListener)
+       // mainRecycler.setOnScrollListener(scrollListener)
     }
-    */
+
 
     // загрузка первой страницы
     fun downloadFirstPage() {
@@ -261,6 +269,11 @@ class HomeFragment : Fragment() {
         newList.addAll(filmsAdapter.getItems())
         newList.addAll(addedList)
         return newList
+    }
+
+    // загрузка первой страницы
+    fun downloadAllPages() {
+        filmsAdapter.addItems(repository.filmsDataBase)
     }
 
 }
