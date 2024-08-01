@@ -101,22 +101,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    // инициализация верхнего меню
-    /*fun initTopAppBar() {
-        topAppBar = binding.topAppBar
-        topAppBar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.settings -> {
-                    Toast.makeText(this, "Настройки", Toast.LENGTH_SHORT).show()
-                    true
-                }
-
-                else -> false
-            }
-        }
-    }*/
-
-
     // инициализация нижнего меню
     fun initBottomNavigation() {
         bottom_navigation = binding.bottomNavigation

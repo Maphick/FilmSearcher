@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#3F51B5</color>
     <color name="colorWhitePink">#F1DFE5</color>
     <color name="colorBlack">#0E0E0E</color>
+    <color name="splashscreen_background">#AB81DF</color>
+    <color name="splashscreen_text">#F781DF</color>
 </resources>

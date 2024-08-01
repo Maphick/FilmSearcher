@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.makashovadev.filmsearcher.data.dto.Film
 import com.makashovadev.filmsearcher.databinding.FilmItemBinding
 
@@ -30,7 +31,15 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
             //Устанавливаем заголовок
             filmBinding.title.text = film.title
             //Устанавливаем постер
-            filmBinding.poster.setImageResource(film.poster)
+            //Указываем контейнер, в котором будет "жить" наша картинка
+            Glide.with(itemView)
+                //Загружаем сам ресурс
+                .load(film.poster)
+                //Центруем изображение
+                .centerCrop()
+                //Указываем ImageView, куда будем загружать изображение
+                .into(filmBinding.poster)
+            //filmBinding.poster.setImageResource(film.poster)
             //Устанавливаем описание
             filmBinding.description.text = film.description
         }
