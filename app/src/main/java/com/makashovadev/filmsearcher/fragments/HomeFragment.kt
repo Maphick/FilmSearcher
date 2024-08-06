@@ -1,26 +1,11 @@
 package com.makashovadev.filmsearcher.fragments
 
 
-import android.annotation.SuppressLint
-import android.database.Cursor
-import android.database.MatrixCursor
 import android.os.Bundle
-import android.provider.BaseColumns
-import android.transition.Scene
-import android.transition.Slide
-import android.transition.TransitionManager
-import android.transition.TransitionSet
-import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CursorAdapter
-import android.widget.EditText
-import android.widget.LinearLayout
-import androidx.annotation.Nullable
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.cursoradapter.widget.SimpleCursorAdapter
@@ -29,7 +14,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.appbar.MaterialToolbar
 import com.makashovadev.filmsearcher.AnimationHelper
 import com.makashovadev.filmsearcher.MainActivity
 import com.makashovadev.filmsearcher.R
@@ -60,9 +44,14 @@ class HomeFragment : Fragment() {
     private lateinit var searchView: SearchView
     private lateinit var mAdapter: SimpleCursorAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         _myIncludeLayoutBinding = MergeHomeScreenContentBinding.bind(binding.root)
+        AnimationHelper.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 1)
         return binding.root
     }
 
@@ -80,9 +69,6 @@ class HomeFragment : Fragment() {
     }
 
 
-
-
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         homeFragmentRoot = binding.homeFragmentRoot
@@ -93,32 +79,6 @@ class HomeFragment : Fragment() {
         initSearchView()
         //Кладем нашу БД в
         downloadAllPages()
-        //filmsAdapter.addItems(repository.filmsDataBase)
-        //makeAnimation()
-
-        AnimationHelper.performFragmentCircularRevealAnimation(homeFragmentRoot, requireActivity(), 1)
-
-
-
-    }
-
-    fun makeAnimation()
-    {
-        val scene = Scene.getSceneForLayout(homeFragmentRoot, R.layout.merge_home_screen_content, requireContext())
-        //Создаем анимацию выезда поля поиска сверху
-        //val searchSlide = Slide(Gravity.BOTTOM).addTarget(searchView)
-        //Создаем анимацию выезда RV снизу
-        val recyclerSlide = Slide(Gravity.TOP).addTarget(mainRecycler)
-        //Создаем экземпляр TransitionSet, который объединит все наши анимации
-        val customTransition = TransitionSet().apply {
-            //Устанавливаем время, за которое будет проходить анимация
-            duration = 500
-            //Добавляем сами анимации
-            addTransition(recyclerSlide)
-           // addTransition(searchSlide)
-        }
-//Также запускаем через TransitionManager, но вторым параметром передаем нашу кастомную анимацию
-        TransitionManager.go(scene, customTransition)
     }
 
     fun InitMAdapter() {
@@ -247,7 +207,7 @@ class HomeFragment : Fragment() {
                 }
             }
         }
-       // mainRecycler.setOnScrollListener(scrollListener)
+        // mainRecycler.setOnScrollListener(scrollListener)
     }
 
 
