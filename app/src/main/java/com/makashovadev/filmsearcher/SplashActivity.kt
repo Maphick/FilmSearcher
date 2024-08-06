@@ -22,7 +22,7 @@ class SplashActivity : AppCompatActivity() {
                 // чтобы не возвращаться на сплеш скрин
                 finish()
             },
-            3000
+            6000
         )
         binding = ActivitySplashBinding.inflate(layoutInflater)
         splashscreen_icon_view = binding.splashscreenIconView
@@ -33,7 +33,7 @@ class SplashActivity : AppCompatActivity() {
     // запуск векторной анимации с имитацией загрузки
     fun startAnimation() {
         val arrowBackToCloseDrawable =
-            AnimatedVectorDrawableCompat.create(this, R.drawable.avd_splashscreen)
+            AnimatedVectorDrawableCompat.create(this, R.drawable.avd_anim_blink)
         splashscreen_icon_view.setImageDrawable(arrowBackToCloseDrawable)
         if (arrowBackToCloseDrawable != null) {
             arrowBackToCloseDrawable.start()

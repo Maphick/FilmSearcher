@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.makashovadev.filmsearcher.AnimationHelper
 import com.makashovadev.filmsearcher.MainActivity
 import com.makashovadev.filmsearcher.R
 import com.makashovadev.filmsearcher.data.dto.Film
@@ -40,6 +41,7 @@ class FavoritesFragment : Fragment() {
     fun Init(): View? {
         favoritesBinding = FragmentFavoritesBinding.inflate(layoutInflater)
         val view = favoritesBinding.root
+        AnimationHelper.performFragmentCircularRevealAnimation(favoritesBinding.root, requireActivity(), 1)
         return view
     }
 

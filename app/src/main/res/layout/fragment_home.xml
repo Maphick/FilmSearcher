@@ -3,7 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/home_fragment_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/background_home"
+    android:visibility="invisible"
+    tools:visibility="visible">
 
     <include layout="@layout/merge_home_screen_content" />
 </androidx.constraintlayout.widget.ConstraintLayout>
+
