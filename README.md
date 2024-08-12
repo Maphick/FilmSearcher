@@ -10,8 +10,6 @@
 <br><br><br>
 | Main screen                                                                                                                                                                                                                    | Info screen                                             |
 |:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
-| <img src ="/./app/src/main/res/drawable/0.png" width=400>| <img src ="/./app/src/main/res/drawable/1.png" width=400> |
-| <img src ="/./app/src/main/res/drawable/2.png" width=400>| <img src ="/./app/src/main/res/drawable/3.png" width=400> |
 | <img src ="/./app/src/main/res/drawable/4.png" width=400>| <img src ="/./app/src/main/res/drawable/5.png" width=400> |
 
 |  20. Android Views:
