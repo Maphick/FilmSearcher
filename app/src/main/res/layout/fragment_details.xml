@@ -33,6 +33,12 @@
                 android:src="@drawable/ic_launcher_foreground"
                 app:layout_collapseMode="parallax" />
 
+            <com.makashovadev.filmsearcher.RatingDonutView
+                app:stroke="10"
+                app:progress="55"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/details_toolbar"
                 android:layout_width="match_parent"

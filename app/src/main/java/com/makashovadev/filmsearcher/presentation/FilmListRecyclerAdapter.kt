@@ -42,6 +42,9 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
             //filmBinding.poster.setImageResource(film.poster)
             //Устанавливаем описание
             filmBinding.description.text = film.description
+            //Устанавливаем рэйтинг
+            filmBinding.ratingDonut.setProgress((film.rating * 10).toInt())
+
         }
     }
 

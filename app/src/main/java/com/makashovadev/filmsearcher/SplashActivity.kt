@@ -22,7 +22,7 @@ class SplashActivity : AppCompatActivity() {
                 // чтобы не возвращаться на сплеш скрин
                 finish()
             },
-            6000
+            3000
         )
         binding = ActivitySplashBinding.inflate(layoutInflater)
         splashscreen_icon_view = binding.splashscreenIconView
