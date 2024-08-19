@@ -1,8 +1,6 @@
-package com.makashovadev.filmsearcher
+package com.makashovadev.filmsearcher.utils
 
-import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
-import android.animation.LayoutTransition
 import android.animation.ObjectAnimator
 import android.view.View
 import android.view.animation.BounceInterpolator

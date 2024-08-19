@@ -2,24 +2,17 @@ package com.makashovadev.filmsearcher.data.repository
 
 
 import com.makashovadev.filmsearcher.R
-import com.makashovadev.filmsearcher.data.dto.Film
+import com.makashovadev.filmsearcher.domain.Film
+import com.makashovadev.filmsearcher.domain.Interactor
 import kotlin.random.Random
 
-class Repository {
-    private var pageInfo = PageInfo()
+class MainRepository {
+
     private val mayException = false // false чтобы не вызывать случайным образом ошибки подргузки
     val filmsDataBase: MutableList<Film> = mutableListOf()
 
-    init {
-        reset()
-    }
 
-    fun reset() {
-        initProducts()
-        pageInfo = PageInfo()
-    }
-
-    private fun initProducts() {
+    fun initProducts() {
         filmsDataBase.add(
             Film(
                 0,
@@ -167,47 +160,5 @@ class Repository {
         )
     }
 
-    fun firstPage(): MutableList<Film> {
-        pageInfo.nextPage()
-        var firstIndex = pageInfo.page * pageInfo.COUNT_ON_PAGE
-        var endIndex = firstIndex + pageInfo.COUNT_ON_PAGE - 1
-
-        if (firstIndex > filmsDataBase.size - 1 || endIndex > filmsDataBase.size - 1) {
-            pageInfo.isFinish = true
-            if (firstIndex > filmsDataBase.size - 1) firstIndex = filmsDataBase.size - 1
-            if (endIndex > filmsDataBase.size - 1) endIndex = filmsDataBase.size - 1
-        }
-
-        return filmsDataBase.slice(firstIndex..endIndex).toMutableList()
-    }
-
-    fun nextPage(): MutableList<Film> {
-        if (mayException) {
-            if (Random.nextBoolean())
-                throw Exception()
-        }
-        if (pageInfo.isFinish) return mutableListOf()
-        pageInfo.nextPage()
-        var firstIndex = pageInfo.page * pageInfo.COUNT_ON_PAGE
-        var endIndex = firstIndex + pageInfo.COUNT_ON_PAGE - 1
-
-        if (firstIndex > filmsDataBase.size - 1 || endIndex > filmsDataBase.size - 1) {
-            pageInfo.isFinish = true
-            if (firstIndex > filmsDataBase.size - 1) firstIndex = filmsDataBase.size - 1
-            if (endIndex > filmsDataBase.size - 1) endIndex = filmsDataBase.size - 1
-        }
-
-        return filmsDataBase.slice(firstIndex..endIndex).toMutableList()
-    }
-
-
-    /** class for save page info*/
-    inner class PageInfo(var page: Int = -1) {
-        val COUNT_ON_PAGE = 6
-        var isFinish = false
-        fun nextPage() {
-            page += 1
-        }
-    }
 
 }

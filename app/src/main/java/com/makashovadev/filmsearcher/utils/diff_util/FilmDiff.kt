@@ -1,9 +1,9 @@
-package com.makashovadev.filmsearcher.diff_util
+package com.makashovadev.filmsearcher.utils.diff_util
 
 import android.annotation.SuppressLint
 import androidx.recyclerview.widget.DiffUtil
-import com.makashovadev.filmsearcher.data.dto.Film
-import com.makashovadev.filmsearcher.presentation.FilmListRecyclerAdapter
+import com.makashovadev.filmsearcher.domain.Film
+import com.makashovadev.filmsearcher.view.rv_adapters.FilmListRecyclerAdapter
 
 class FilmDiff(val oldList: ArrayList<Film>, val newList: ArrayList<Film>) :
     DiffUtil.Callback() {

@@ -1,4 +1,4 @@
-package com.makashovadev.filmsearcher.data.dto
+package com.makashovadev.filmsearcher.domain
 
 import android.os.Parcel
 import android.os.Parcelable

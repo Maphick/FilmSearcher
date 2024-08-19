@@ -1,4 +1,4 @@
-package com.makashovadev.filmsearcher.decorator
+package com.makashovadev.filmsearcher.view.rv_adapters.decorator
 
 import android.graphics.Canvas
 import android.graphics.Rect

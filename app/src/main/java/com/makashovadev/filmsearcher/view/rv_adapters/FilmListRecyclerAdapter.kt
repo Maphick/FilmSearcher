@@ -1,12 +1,12 @@
-package com.makashovadev.filmsearcher.presentation
+package com.makashovadev.filmsearcher.view.rv_adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.makashovadev.filmsearcher.data.dto.Film
+import com.makashovadev.filmsearcher.domain.Film
 import com.makashovadev.filmsearcher.databinding.FilmItemBinding
+import com.makashovadev.filmsearcher.view.rv_viewholders.FilmViewHolder
 
 //в параметр передаем слушатель, чтобы мы потом могли обрабатывать нажатия из класса Activity
 class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
@@ -22,30 +22,6 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
 
     fun setItems(newList: List<Film>) {
         items = newList.toMutableList()
-    }
-
-    class FilmViewHolder(private val filmBinding: FilmItemBinding) :
-        RecyclerView.ViewHolder(filmBinding.root) {
-        //В этом методе кладем данные из Film в наши View
-        fun onBind(film: Film) {
-            //Устанавливаем заголовок
-            filmBinding.title.text = film.title
-            //Устанавливаем постер
-            //Указываем контейнер, в котором будет "жить" наша картинка
-            Glide.with(itemView)
-                //Загружаем сам ресурс
-                .load(film.poster)
-                //Центруем изображение
-                .centerCrop()
-                //Указываем ImageView, куда будем загружать изображение
-                .into(filmBinding.poster)
-            //filmBinding.poster.setImageResource(film.poster)
-            //Устанавливаем описание
-            filmBinding.description.text = film.description
-            //Устанавливаем рэйтинг
-            filmBinding.ratingDonut.setProgress((film.rating * 10).toInt())
-
-        }
     }
 
 

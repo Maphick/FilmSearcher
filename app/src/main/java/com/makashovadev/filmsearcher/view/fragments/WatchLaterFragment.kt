@@ -1,12 +1,11 @@
-package com.makashovadev.filmsearcher.fragments
+package com.makashovadev.filmsearcher.view.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.makashovadev.filmsearcher.AnimationHelper
-import com.makashovadev.filmsearcher.R
+import com.makashovadev.filmsearcher.utils.AnimationHelper
 import com.makashovadev.filmsearcher.databinding.FragmentWatchLaterBinding
 
 class WatchLaterFragment : Fragment()

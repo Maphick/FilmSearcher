@@ -9,13 +9,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.makashovadev.filmsearcher.data.dto.Film
+import com.makashovadev.filmsearcher.domain.Film
 import com.makashovadev.filmsearcher.databinding.ActivityMainBinding
-import com.makashovadev.filmsearcher.fragments.DetailsFragment
-import com.makashovadev.filmsearcher.fragments.FavoritesFragment
-import com.makashovadev.filmsearcher.fragments.HomeFragment
-import com.makashovadev.filmsearcher.fragments.SelectionsFragment
-import com.makashovadev.filmsearcher.fragments.WatchLaterFragment
+import com.makashovadev.filmsearcher.view.fragments.DetailsFragment
+import com.makashovadev.filmsearcher.view.fragments.FavoritesFragment
+import com.makashovadev.filmsearcher.view.fragments.HomeFragment
+import com.makashovadev.filmsearcher.view.fragments.SelectionsFragment
+import com.makashovadev.filmsearcher.view.fragments.WatchLaterFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -152,9 +152,10 @@ class MainActivity : AppCompatActivity() {
     private fun changeFragment(fragment: Fragment, tag: String) {
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.fragment_placeholder, fragment, tag)
+            .replace(fragment_placeholder.id, fragment, tag)
             .addToBackStack(null)
             .commit()
     }
-
+    // .replace(  R.id.fragment_placeholder, fragment, tag)
+    // binding.fragmentPlaceholder.id
 }
