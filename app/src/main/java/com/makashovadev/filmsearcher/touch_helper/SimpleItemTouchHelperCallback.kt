@@ -1,15 +1,12 @@
 package com.makashovadev.filmsearcher.touch_helper
 
 
-import android.annotation.SuppressLint
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.makashovadev.filmsearcher.data.dto.Film
-import com.makashovadev.filmsearcher.diff_util.FilmDiff
-import com.makashovadev.filmsearcher.diff_util.updateData
-import com.makashovadev.filmsearcher.presentation.FilmListRecyclerAdapter
+import com.makashovadev.filmsearcher.domain.Film
+import com.makashovadev.filmsearcher.utils.diff_util.updateData
+import com.makashovadev.filmsearcher.view.rv_adapters.FilmListRecyclerAdapter
 import java.util.Collections
 
 

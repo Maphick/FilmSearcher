@@ -1,27 +1,18 @@
-package com.makashovadev.filmsearcher.fragments
+package com.makashovadev.filmsearcher.view.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.makashovadev.filmsearcher.AnimationHelper
+import com.makashovadev.filmsearcher.utils.AnimationHelper
 import com.makashovadev.filmsearcher.MainActivity
-import com.makashovadev.filmsearcher.R
-import com.makashovadev.filmsearcher.data.dto.Film
-import com.makashovadev.filmsearcher.databinding.FragmentDetailsBinding
+import com.makashovadev.filmsearcher.domain.Film
 import com.makashovadev.filmsearcher.databinding.FragmentFavoritesBinding
-import com.makashovadev.filmsearcher.decorator.PaginationLoadingDecoration
-import com.makashovadev.filmsearcher.decorator.TopSpacingItemDecoration
-import com.makashovadev.filmsearcher.presentation.FilmListRecyclerAdapter
-import com.makashovadev.filmsearcher.touch_helper.SimpleItemTouchHelperCallback
+import com.makashovadev.filmsearcher.view.rv_adapters.decorator.TopSpacingItemDecoration
+import com.makashovadev.filmsearcher.view.rv_adapters.FilmListRecyclerAdapter
 
 // фрагмент для отображения избранных фильмов
 class FavoritesFragment : Fragment() {

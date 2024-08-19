@@ -1,4 +1,4 @@
-package com.makashovadev.filmsearcher
+package com.makashovadev.filmsearcher.view.customviews
 
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
@@ -11,6 +11,7 @@ import android.graphics.RectF
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
+import com.makashovadev.filmsearcher.R
 
 
 // Кастомный прогресс-бар, который будет показывать, какой рейтинг у фильма
@@ -56,6 +57,7 @@ class RatingDonutView @JvmOverloads constructor(
         }
         //Инициализируем первоначальные краски
         initPaint()
+        //animateArc()
     }
 
     fun setProgress(pr: Int,  st: Float = 10f) {
@@ -72,7 +74,8 @@ class RatingDonutView @JvmOverloads constructor(
 
     // анимация с использованием ValueAnimator
     private fun animateArc() {
-        val valuesHolder = PropertyValuesHolder.ofFloat(PERCENTAGE_VALUE_HOLDER, 0f,
+        val valuesHolder = PropertyValuesHolder.ofFloat(
+            PERCENTAGE_VALUE_HOLDER, 0f,
             convertProgressToDegrees(progress))
         val animator = ValueAnimator().apply {
             setValues(valuesHolder)
