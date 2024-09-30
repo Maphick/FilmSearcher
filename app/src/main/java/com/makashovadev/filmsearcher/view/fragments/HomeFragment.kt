@@ -207,8 +207,8 @@ class HomeFragment : Fragment() {
                 //сколько всего элементов
                 val totalItemCount: Int = layoutManager.itemCount
                 //какая позиция первого элемента
-                val firstVisibleItems =
-                    (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                val firstVisibleItems = (recyclerView.layoutManager as LinearLayoutManager)
+                    .findFirstVisibleItemPosition()
                 //проверяем, грузим мы что-то или нет
                 if (!isLoading) {
                     if (visibleItemCount + firstVisibleItems >= totalItemCount) {
