@@ -224,7 +224,7 @@ class HomeFragment : Fragment() {
                             //  если разблокировать - можно увидеть прогресс бар =)
                            /* Handler().postDelayed({
                                 // Оповещение RecyclerView об изменении данных с помощью DiffUtil.
-                                //updateData(newList, filmsAdapter)
+
                                 isLoading = false
                             }, 5000)
                             */
