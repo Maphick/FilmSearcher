@@ -2,6 +2,7 @@ package com.makashovadev.filmsearcher.view.rv_viewholders
 
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.makashovadev.filmsearcher.data.Entity.ApiConstants
 import com.makashovadev.filmsearcher.databinding.FilmItemBinding
 import com.makashovadev.filmsearcher.domain.Film
 
@@ -14,8 +15,10 @@ class FilmViewHolder(private val filmBinding: FilmItemBinding) :
         //Устанавливаем постер
         //Указываем контейнер, в котором будет "жить" наша картинка
         Glide.with(itemView)
-            //Загружаем сам ресурс
-            .load(film.poster)
+            // Загружаем сам ресурс
+            // "w342" — это размер изображения, который нужно загрузить, поскольку у нас там
+            // небольшая картинка, то нам и не нужен большой размер
+            .load(ApiConstants.IMAGES_URL + "w342" + film.poster)
             //Центруем изображение
             .centerCrop()
             //Указываем ImageView, куда будем загружать изображение

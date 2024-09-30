@@ -3,7 +3,6 @@ package com.makashovadev.filmsearcher.view.rv_adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.makashovadev.filmsearcher.domain.Film
 import com.makashovadev.filmsearcher.databinding.FilmItemBinding
 import com.makashovadev.filmsearcher.view.rv_viewholders.FilmViewHolder
@@ -65,6 +64,20 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
         notifyDataSetChanged()
     }
 
+
+    /*
+    //Метод для добавления объектов в наш список
+    fun changeItems(list: List<Film>) {
+        val diff = FilmDiff(items, list)
+        val diffResult = DiffUtil.calculateDiff(diff)
+        //Сначала очищаем
+        items.clear()
+        //Добавляем
+        items.addAll(list)
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    */
 
     //Интерфейс для обработки кликов
     interface OnItemClickListener {

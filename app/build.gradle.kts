@@ -39,11 +39,18 @@ android {
 }
 
 dependencies {
-
     //MaterialDesign
-    implementation("com.google.android.material:material:1.12.0")
+    implementation(libs.material)
+    // Retrofit
+    implementation(libs.retrofit2)
+    // Converter Json
+    implementation(libs.converter)
+    // Adapter RxJava2
+    implementation(libs.adapter)
+    // Logging Interceptor
+    implementation(libs.logging)
     // Glide
-    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.glide)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
