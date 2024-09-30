@@ -221,12 +221,12 @@ class HomeFragment : Fragment() {
                             downloadAnyPage(currentPage)
                             // задержка для демонстрации загрузки
                             //  если разблокировать - можно увидеть прогресс бар =)
-                           /* Handler().postDelayed({
+                            Handler().postDelayed({
                                 // Оповещение RecyclerView об изменении данных с помощью DiffUtil.
 
                                 isLoading = false
                             }, 5000)
-                            */
+
                         }
                     }
 
