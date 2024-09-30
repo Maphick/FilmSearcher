@@ -206,7 +206,6 @@ class HomeFragment : Fragment() {
                 val visibleItemCount: Int = layoutManager.childCount
                 //сколько всего элементов
                 val totalItemCount: Int = layoutManager.itemCount
-
                 //какая позиция первого элемента
                 val firstVisibleItems =
                     (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
