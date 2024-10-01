@@ -2,10 +2,11 @@ package com.makashovadev.filmsearcher.utils.diff_util
 
 import android.annotation.SuppressLint
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.DiffUtil.DiffResult
 import com.makashovadev.filmsearcher.domain.Film
 import com.makashovadev.filmsearcher.view.rv_adapters.FilmListRecyclerAdapter
 
-class FilmDiff(val oldList: ArrayList<Film>, val newList: ArrayList<Film>) :
+class FilmDiff(val oldList: List<Film>, val newList: List<Film>) :
     DiffUtil.Callback() {
     override fun getOldListSize(): Int {
         return oldList.size
@@ -15,20 +16,12 @@ class FilmDiff(val oldList: ArrayList<Film>, val newList: ArrayList<Film>) :
         return newList.size
     }
 
-    //Элементы одинаковые
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        val a = oldList[oldItemPosition].hashCode()
-        val b = newList[newItemPosition].hashCode()
-        return oldList[oldItemPosition].id == newList[newItemPosition].id
+        return oldList[oldItemPosition] == newList[newItemPosition]
     }
 
-    //Содержимое одинаковое
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        val oldProduct = oldList[oldItemPosition]
-        val newProduct = newList[newItemPosition]
-        return ((oldProduct.title == newProduct.title) &&
-                (oldProduct.description == newProduct.description) &&
-                (oldProduct.poster == newProduct.poster))
+        return oldList[oldItemPosition] == newList[newItemPosition]
     }
 }
 
@@ -41,3 +34,19 @@ fun updateData(newList: java.util.ArrayList<Film>, adapter: FilmListRecyclerAdap
     adapter.setItems(newList)
     diffResult.dispatchUpdatesTo(adapter)
 }
+
+
+
+
+// Сравнение старого и нового списков
+@SuppressLint("NotifyDataSetChanged")
+fun updateData(newList: List<Film>,  oldList:List<Film>): DiffResult {
+    //val oldList: java.util.ArrayList<Film> = adapter.getItems() as java.util.ArrayList<Film>
+    val diff = FilmDiff(oldList, newList)
+    val diffResult = DiffUtil.calculateDiff(diff)
+    return diffResult
+    //adapter.setItems(newList)
+   // diffResult.dispatchUpdatesTo(adapter)
+}
+
+

@@ -50,43 +50,6 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-    // при нажатии кнопки  "назад"
-    override fun onBackPressed() {
-       // if (supportFragmentManager.)
-
-
-        // если это последний экран
-        if (supportFragmentManager.backStackEntryCount == 1) {
-            // то вызывается алерт диалог
-            BuildAlertDialog()
-        } else {
-            super.onBackPressed()
-        }
-    }
-
-
-
-    // всплывающее меню о том, что пользователь сейчас покинет приложение
-    fun BuildAlertDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Вы хотите выйти?")
-            .setIcon(R.drawable.baseline_menu_24)
-            .setPositiveButton("Да") { _, _ ->
-                finish()
-            }
-            .setNegativeButton("Нет") { _, _ ->
-
-            }
-            .setNeutralButton("Не знаю") { _, _ ->
-                Toast.makeText(this, "Решайся", Toast.LENGTH_SHORT).show()
-            }
-            .setMessage("Нам не хотелось бы, чтобы вы уходили")
-            .setView(EditText(this))
-            .show()
-    }
-
-
-
 
     fun launchDetailsFragment(film: Film) {
         //Создаем "посылку"
@@ -101,11 +64,11 @@ class MainActivity : AppCompatActivity() {
         //Запускаем фрагмент
         supportFragmentManager
             .beginTransaction()
+            .setReorderingAllowed(true)
             .replace(fragment_placeholder.id, fragment)
             .addToBackStack(null)
             .commit()
     }
-
 
     // инициализация нижнего меню
     fun initBottomNavigation() {

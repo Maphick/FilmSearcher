@@ -10,8 +10,10 @@ import android.widget.TextView
 
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.makashovadev.filmsearcher.R
+import com.makashovadev.filmsearcher.data.Entity.ApiConstants
 import com.makashovadev.filmsearcher.domain.Film
 import com.makashovadev.filmsearcher.databinding.FragmentDetailsBinding
 
@@ -95,8 +97,11 @@ class DetailsFragment : Fragment() {
         val film = arguments?.get("film") as Film
         //Устанавливаем заголовок
         details_toolbar.title = film.title
-        //Устанавливаем картинку
-        details_poster.setImageResource(film.poster)
+        // загрузку картинки, когда мы создаем фрагмент с деталями фильма в DetailsFragment:
+        Glide.with(this)
+            .load(ApiConstants.IMAGES_URL + "w780" + film.poster)
+            .centerCrop()
+            .into(details_poster)
         //Устанавливаем описание
         details_description.text = film.description
         currentFilm = film

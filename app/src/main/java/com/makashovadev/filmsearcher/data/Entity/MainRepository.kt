@@ -1,18 +1,17 @@
-package com.makashovadev.filmsearcher.data.repository
+package com.makashovadev.filmsearcher.data.Entity
 
 
 import com.makashovadev.filmsearcher.R
 import com.makashovadev.filmsearcher.domain.Film
-import com.makashovadev.filmsearcher.domain.Interactor
-import kotlin.random.Random
 
 class MainRepository {
 
     private val mayException = false // false чтобы не вызывать случайным образом ошибки подргузки
     val filmsDataBase: MutableList<Film> = mutableListOf()
 
-
+    /*
     fun initProducts() {
+
         filmsDataBase.add(
             Film(
                 0,
@@ -159,6 +158,7 @@ class MainRepository {
             )
         )
     }
+    */
 
 
 }
