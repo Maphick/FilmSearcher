@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.makashovadev.filmsearcher.App
 import com.makashovadev.filmsearcher.domain.Film
 import com.makashovadev.filmsearcher.domain.Interactor
+import com.makashovadev.filmsearcher.utils.diff_util.updateData
 
 
 class HomeFragmentViewModel : ViewModel() {
@@ -35,15 +36,34 @@ class HomeFragmentViewModel : ViewModel() {
         interactor.getFilmsFromApi(page, object : ApiCallback {
             override fun onSuccess(films: List<Film>) {
                 // добавление новых фильмов
+
+                // старые значения
                 var oldData = mutableListOf<Film>()
                 filmsListLiveData.value?.let { oldData.addAll(it) }
-                oldData.addAll(films)
-                filmsListLiveData.postValue(oldData.toList())
+
+                // ---------------------------------------------------------------------------------
+                // Тут, по идее, diffResult вычисляется
+                // новые значения
+                var newData = mutableListOf<Film>()
+                newData.addAll(films)
+                // сравнение старых и новых значений
+                var diffResult = updateData(oldData, newData)
+                //  Не совсем понятно, как применять diffResult к адаптеру ресайклер вью
+                // если теперь мы полписаны на вью модель и адаптер автоматически обновляется
+                // по изменению во вью модели
+                // TODO: что-то сделать с diffResult =))
+                // ---------------------------------------------------------------------------------
+
+                // добавление старых и новых значений в лайв дату
+                oldData.addAll(newData)
+                filmsListLiveData.postValue(oldData)
+
             }
             override fun onFailure() {
             }
         })
     }
+
 
 
 

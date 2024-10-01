@@ -218,12 +218,12 @@ class HomeFragment : Fragment() {
                         isLoading = true
                         currentPage += 1
                         if (currentPage <= TOTAL_PAGES) {
+                            // загрузка следующей страницы
                             downloadAnyPage(currentPage)
                             // задержка для демонстрации загрузки
                             //  если разблокировать - можно увидеть прогресс бар =)
                             Handler().postDelayed({
                                 // Оповещение RecyclerView об изменении данных с помощью DiffUtil.
-
                                 isLoading = false
                             }, 5000)
 
