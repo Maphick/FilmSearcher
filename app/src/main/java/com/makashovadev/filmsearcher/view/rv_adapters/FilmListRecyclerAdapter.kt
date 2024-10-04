@@ -20,6 +20,7 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
     }
 
     fun setItems(newList: List<Film>) {
+        //items.clear()
         items = newList.toMutableList()
     }
 
@@ -64,20 +65,6 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
         notifyDataSetChanged()
     }
 
-
-    /*
-    //Метод для добавления объектов в наш список
-    fun changeItems(list: List<Film>) {
-        val diff = FilmDiff(items, list)
-        val diffResult = DiffUtil.calculateDiff(diff)
-        //Сначала очищаем
-        items.clear()
-        //Добавляем
-        items.addAll(list)
-        diffResult.dispatchUpdatesTo(this)
-    }
-
-    */
 
     //Интерфейс для обработки кликов
     interface OnItemClickListener {

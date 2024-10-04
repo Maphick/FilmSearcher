@@ -27,26 +27,12 @@ class FilmDiff(val oldList: List<Film>, val newList: List<Film>) :
 
 // Оповещение RecyclerView об изменении данных с помощью DiffUtil.
 @SuppressLint("NotifyDataSetChanged")
-fun updateData(newList: java.util.ArrayList<Film>, adapter: FilmListRecyclerAdapter) {
+fun updateData(newList: List<Film>, adapter: FilmListRecyclerAdapter) {
     val oldList: java.util.ArrayList<Film> = adapter.getItems() as java.util.ArrayList<Film>
     val diff = FilmDiff(oldList, newList)
     val diffResult = DiffUtil.calculateDiff(diff)
-    adapter.setItems(newList)
+    oldList.addAll(newList)
+    adapter.setItems(oldList)
     diffResult.dispatchUpdatesTo(adapter)
 }
-
-
-
-
-// Сравнение старого и нового списков
-@SuppressLint("NotifyDataSetChanged")
-fun updateData(newList: List<Film>,  oldList:List<Film>): DiffResult {
-    //val oldList: java.util.ArrayList<Film> = adapter.getItems() as java.util.ArrayList<Film>
-    val diff = FilmDiff(oldList, newList)
-    val diffResult = DiffUtil.calculateDiff(diff)
-    return diffResult
-    //adapter.setItems(newList)
-   // diffResult.dispatchUpdatesTo(adapter)
-}
-
 

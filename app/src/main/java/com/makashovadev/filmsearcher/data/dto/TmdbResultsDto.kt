@@ -13,3 +13,4 @@ data class TmdbResultsDto(
     @SerializedName("total_results")
     val total_results: Int
 )
+

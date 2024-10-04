@@ -35,29 +35,7 @@ class HomeFragmentViewModel : ViewModel() {
     fun loadPage(page: Int) {
         interactor.getFilmsFromApi(page, object : ApiCallback {
             override fun onSuccess(films: List<Film>) {
-                // добавление новых фильмов
-
-                // старые значения
-                var oldData = mutableListOf<Film>()
-                filmsListLiveData.value?.let { oldData.addAll(it) }
-
-                // ---------------------------------------------------------------------------------
-                // Тут, по идее, diffResult вычисляется
-                // новые значения
-                var newData = mutableListOf<Film>()
-                newData.addAll(films)
-                // сравнение старых и новых значений
-                var diffResult = updateData(oldData, newData)
-                //  Не совсем понятно, как применять diffResult к адаптеру ресайклер вью
-                // если теперь мы полписаны на вью модель и адаптер автоматически обновляется
-                // по изменению во вью модели
-                // TODO: что-то сделать с diffResult =))
-                // ---------------------------------------------------------------------------------
-
-                // добавление старых и новых значений в лайв дату
-                oldData.addAll(newData)
-                filmsListLiveData.postValue(oldData)
-
+                filmsListLiveData.postValue(films)
             }
             override fun onFailure() {
             }

@@ -13,6 +13,7 @@ import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
@@ -25,6 +26,7 @@ import com.makashovadev.filmsearcher.databinding.MergeHomeScreenContentBinding
 import com.makashovadev.filmsearcher.domain.Film
 import com.makashovadev.filmsearcher.touch_helper.SimpleItemTouchHelperCallback
 import com.makashovadev.filmsearcher.utils.AnimationHelper
+import com.makashovadev.filmsearcher.utils.diff_util.FilmDiff
 import com.makashovadev.filmsearcher.utils.diff_util.updateData
 import com.makashovadev.filmsearcher.view.rv_adapters.FilmListRecyclerAdapter
 import com.makashovadev.filmsearcher.view.rv_adapters.decorator.PaginationLoadingDecoration
@@ -37,6 +39,7 @@ class HomeFragment : Fragment() {
 
     private val binding: FragmentHomeBinding get() = _binding!!
     private var _binding: FragmentHomeBinding? = null
+
     private val myIncludeLayoutBinding: MergeHomeScreenContentBinding get() = _myIncludeLayoutBinding!!
     private var _myIncludeLayoutBinding: MergeHomeScreenContentBinding? = null
 
@@ -73,9 +76,7 @@ class HomeFragment : Fragment() {
 
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         _myIncludeLayoutBinding = MergeHomeScreenContentBinding.bind(binding.root)
@@ -97,7 +98,6 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         AnimationHelper.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 1)
-
         homeFragmentRoot = binding.homeFragmentRoot
         //находим наш RV
         initRV()
@@ -105,20 +105,17 @@ class HomeFragment : Fragment() {
         RecyclerViewSetScroollListener()
         initSearchView()
         // подпишемся на изменения этой View Model
-        viewModel.filmsListLiveData.observe(viewLifecycleOwner, Observer<List<Film>> {
-            filmsDataBase = it
-        })
+        viewModel.filmsListLiveData.observe(viewLifecycleOwner) { newData ->
+            updateData(newData, filmsAdapter)
+        }
     }
 
     fun InitMAdapter() {
         val from = arrayOf("items")
         val to = intArrayOf(R.id.text1)
         mAdapter = SimpleCursorAdapter(
-            getActivity(),
-            R.layout.item,
-            null,
-            from, //   колонки в БД
-            to, // поля в БД
+            getActivity(), R.layout.item, null, from, //   колонки в БД
+            to, // поля в БД4
             CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER // флаг, определяющий, как это будет существовать в БД
         )
     }
@@ -207,29 +204,27 @@ class HomeFragment : Fragment() {
                 //сколько всего элементов
                 val totalItemCount: Int = layoutManager.itemCount
                 //какая позиция первого элемента
-                val firstVisibleItems = (recyclerView.layoutManager as LinearLayoutManager)
-                    .findFirstVisibleItemPosition()
+                val firstVisibleItems =
+                    (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                 //проверяем, грузим мы что-то или нет
                 if (!isLoading) {
                     if (visibleItemCount + firstVisibleItems >= totalItemCount) {
                         //ставим флаг, что мы попросили еще элементы
                         isLoading = true
                         //Вызывает загрузку данных в RecyclerView
-                        isLoading = true
                         currentPage += 1
                         if (currentPage <= TOTAL_PAGES) {
                             // загрузка следующей страницы
                             downloadAnyPage(currentPage)
+                            //isLoading = false
                             // задержка для демонстрации загрузки
                             //  если разблокировать - можно увидеть прогресс бар =)
                             Handler().postDelayed({
                                 // Оповещение RecyclerView об изменении данных с помощью DiffUtil.
                                 isLoading = false
-                            }, 5000)
-
+                            }, 2000)
                         }
                     }
-
                 }
             }
         }
