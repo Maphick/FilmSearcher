@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.com.google.devtools.ksp)
 }
 
 android {
@@ -51,6 +52,17 @@ dependencies {
     implementation(libs.logging)
     // Glide
     implementation(libs.glide)
+    // Dagger2
+    implementation(libs.dagger)
+    // Dagger-android-processor
+    implementation(libs.dagger.android.processor)
+    // Dagger-android
+    implementation(libs.dagger.android)
+    // Dagger-android-support
+    implementation(libs.dagger.android.support)
+    // Dagger-compiler
+    ksp(libs.dagger.compiler)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
