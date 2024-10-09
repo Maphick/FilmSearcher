@@ -34,27 +34,6 @@ class App : Application() {
             })
             .build()
 
-        // Create your Retrofit instance
-        val retrofit2 = Retrofit.Builder()
-            .baseUrl("https://api.themoviedb.org/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(OkHttpClient.Builder()
-                .addInterceptor {
-
-                    chain ->
-                    val request = chain.request().newBuilder()
-                        .addHeader("accept", "application/json")
-                        .addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhMjA3NGVhNmJhZDYxNGJhMDQwMmI2MWI3MzkyY2YwMiIsIm5iZiI6MTcyNzMzMjY2Mi43NDQ3NzksInN1YiI6IjY2YzZmYzRlMzlmYjExOWQxNmQ3ZWRhMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.kTq6cXUMkw2F22MYT1J6qKp-kP54lTfgMgH5o0jqFgE")
-                        .build()
-                    chain.proceed(request)
-
-
-                }
-                .build()
-            )
-            .build()
-
-
         //Создаем Ретрофит
         val retrofit = Retrofit.Builder()
             //Указываем базовый URL из констант
@@ -65,18 +44,9 @@ class App : Application() {
             .client(okHttpClient).build()
             //Создаем сам сервис с методами для запросов
 
-
-        /*val request = Request.Builder()
-            .url("https://api.themoviedb.org/3/movie/movie_id/images")
-            .get()
-            .addHeader("accept", "application/json")
-            .addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhMjA3NGVhNmJhZDYxNGJhMDQwMmI2MWI3MzkyY2YwMiIsIm5iZiI6MTcyNzMzMjY2Mi43NDQ3NzksInN1YiI6IjY2YzZmYzRlMzlmYjExOWQxNmQ3ZWRhMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.kTq6cXUMkw2F22MYT1J6qKp-kP54lTfgMgH5o0jqFgE")
-            .build()*/
-
         val retrofitService = retrofit.create(TmdbApi::class.java)
         //Инициализируем интерактор
         interactor = Interactor(repo, retrofitService)
-
     }
 
     companion object {

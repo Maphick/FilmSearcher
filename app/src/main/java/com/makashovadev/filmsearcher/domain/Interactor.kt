@@ -28,4 +28,7 @@ class Interactor(private val repo: MainRepository, private val retrofitService: 
             }
         })
     }
+
+
+    fun getFilmsDB(): List<Film> = repo.filmsDataBase
 }

@@ -1,12 +1,12 @@
 [versions]
-agp = "8.4.0"
-kotlin = "1.9.0"
-coreKtx = "1.10.1"
+agp = "8.7.0"
+kotlin = "1.9.24"
+coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
-appcompat = "1.6.1"
-activity = "1.8.0"
+appcompat = "1.7.0"
+activity = "1.9.2"
 constraintlayout = "2.1.4"
 material = "1.12.0"
 retrofit2 = "2.11.0"
@@ -14,6 +14,9 @@ converter-gson = "2.11.0"
 adapter-rxjava2 = "2.9.0"
 logging-interceptor = "3.12.6"
 glide = "4.16.0"
+dagger = "2.52"
+com-google-devtools-ksp = "1.9.24-1.0.20"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -29,8 +32,13 @@ converter = { group = "com.squareup.retrofit2", name = "converter-gson", version
 adapter = { group = "com.squareup.retrofit2", name = "adapter-rxjava2", version.ref = "adapter-rxjava2"}
 logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "logging-interceptor"}
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide"}
+dagger = { group = "com.google.dagger", name = "dagger", version.ref = "dagger" }
+dagger-android = { group = "com.google.dagger", name = "dagger-android", version.ref = "dagger" }
+dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger" }
+dagger-android-processor = { group = "com.google.dagger", name = "dagger-android-processor", version.ref = "dagger" }
+dagger-android-support = { group = "com.google.dagger", name = "dagger-android-support", version.ref = "dagger" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-
+com-google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "com-google-devtools-ksp"}
