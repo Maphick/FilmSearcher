@@ -32,9 +32,11 @@ import com.makashovadev.filmsearcher.view.rv_adapters.FilmListRecyclerAdapter
 import com.makashovadev.filmsearcher.view.rv_adapters.decorator.PaginationLoadingDecoration
 import com.makashovadev.filmsearcher.view.rv_adapters.decorator.TopSpacingItemDecoration
 import com.makashovadev.filmsearcher.viewmodel.HomeFragmentViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import jakarta.inject.Inject
 import java.util.Locale
 
-
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private val binding: FragmentHomeBinding get() = _binding!!
@@ -57,10 +59,15 @@ class HomeFragment : Fragment() {
     private val TOTAL_PAGES = 500
     private var currentPage = PAGE_START
 
+    @Inject
+    lateinit var viewModel: HomeFragmentViewModel
+
+    /*
     // Инициализируем (лениво) ViewModel
     private val viewModel by lazy {
         ViewModelProvider.NewInstanceFactory().create(HomeFragmentViewModel::class.java)
     }
+     */
 
     // Создадим переменную, куда будем класть нашу БД из ViewModel, чтобы у нас не сломался поиск
     private var filmsDataBase = listOf<Film>()
