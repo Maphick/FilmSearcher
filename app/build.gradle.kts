@@ -52,6 +52,9 @@ dependencies {
     implementation(libs.logging)
     // Glide
     implementation(libs.glide)
+
+    // DAGGER
+    /*
     // Dagger2
     implementation(libs.dagger)
     // Dagger-android-processor
@@ -62,6 +65,12 @@ dependencies {
     implementation(libs.dagger.android.support)
     // Dagger-compiler
     ksp(libs.dagger.compiler)
+    */
+
+    // Koin
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

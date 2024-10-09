@@ -8,13 +8,15 @@ import com.makashovadev.filmsearcher.App
 import com.makashovadev.filmsearcher.domain.Film
 import com.makashovadev.filmsearcher.domain.Interactor
 import com.makashovadev.filmsearcher.utils.diff_util.updateData
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 
-class HomeFragmentViewModel : ViewModel() {
-    val filmsListLiveData = MutableLiveData<List<Film>>()
+class HomeFragmentViewModel : ViewModel(), KoinComponent {
 
+    val filmsListLiveData:  MutableLiveData<List<Film>> = MutableLiveData()
     //Инициализируем интерактор
-    private var interactor: Interactor = App.instance.interactor
+    private val interactor: Interactor by inject()
 
 
     init {

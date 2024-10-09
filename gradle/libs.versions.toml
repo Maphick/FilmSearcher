@@ -16,6 +16,8 @@ logging-interceptor = "3.12.6"
 glide = "4.16.0"
 dagger = "2.52"
 com-google-devtools-ksp = "1.9.24-1.0.20"
+koin-android = "3.5.0"
+koin-core = "3.5.0"
 
 
 [libraries]
@@ -37,6 +39,9 @@ dagger-android = { group = "com.google.dagger", name = "dagger-android", version
 dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger" }
 dagger-android-processor = { group = "com.google.dagger", name = "dagger-android-processor", version.ref = "dagger" }
 dagger-android-support = { group = "com.google.dagger", name = "dagger-android-support", version.ref = "dagger" }
+koin = { group = "org.koin", name = "koin-android", version.ref = "koin-android" }
+koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin-core" }
+koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin-android" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
