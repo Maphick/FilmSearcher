@@ -16,11 +16,7 @@ import com.makashovadev.filmsearcher.view.fragments.FavoritesFragment
 import com.makashovadev.filmsearcher.view.fragments.HomeFragment
 import com.makashovadev.filmsearcher.view.fragments.SelectionsFragment
 import com.makashovadev.filmsearcher.view.fragments.WatchLaterFragment
-import dagger.hilt.android.AndroidEntryPoint
 
-// Hilt автоматически внедрит требуемые экземпляры в поля класса App
-// (repo, interactor, retrofitService).
-@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     // фрагмент

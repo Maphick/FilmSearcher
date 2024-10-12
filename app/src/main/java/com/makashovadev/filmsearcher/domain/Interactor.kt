@@ -1,19 +1,24 @@
 package com.makashovadev.filmsearcher.domain
 
 import com.makashovadev.filmsearcher.data.Entity.API
-import com.makashovadev.filmsearcher.data.Entity.MainRepository
-import com.makashovadev.filmsearcher.data.Entity.TmdbApi
+import com.makashovadev.filmsearcher.data.Interfaces.TmdbApi
+import com.makashovadev.filmsearcher.data.Interfaces.InteractorInterface
 import com.makashovadev.filmsearcher.data.dto.TmdbResultsDto
 import com.makashovadev.filmsearcher.utils.Converter
 import com.makashovadev.filmsearcher.viewmodel.HomeFragmentViewModel
+import jakarta.inject.Inject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class Interactor(private val repo: MainRepository, private val retrofitService: TmdbApi) {
+class Interactor @Inject constructor
+    (
+    //private val repo: RepositoryInterface,
+    private val retrofitService: TmdbApi):
+    InteractorInterface {
     //В конструктор мы будем передавать коллбэк из вью модели, чтобы реагировать на то, когда фильмы будут получены
     //и страницу, которую нужно загрузить (это для пагинации)
-    fun getFilmsFromApi(page: Int, callback: HomeFragmentViewModel.ApiCallback) {
+    override fun getFilmsFromApi(page: Int, callback: HomeFragmentViewModel.ApiCallback) {
 
 
         retrofitService.getFilms(API.KEY, "ru-RU", page).enqueue(object : Callback<TmdbResultsDto> {
@@ -30,5 +35,5 @@ class Interactor(private val repo: MainRepository, private val retrofitService: 
     }
 
 
-    fun getFilmsDB(): List<Film> = repo.filmsDataBase
+    //fun getFilmsDB(): List<Film> = repo.filmsDataBase
 }
