@@ -1,4 +1,4 @@
-package com.makashovadev.filmsearcher.data.Entity
+package com.makashovadev.filmsearcher.data.Interfaces
 
 import com.makashovadev.filmsearcher.data.dto.TmdbResultsDto
 import retrofit2.Call
@@ -15,3 +15,4 @@ interface TmdbApi {
         @Query("page") page: Int
     ): Call<TmdbResultsDto>
 }
+

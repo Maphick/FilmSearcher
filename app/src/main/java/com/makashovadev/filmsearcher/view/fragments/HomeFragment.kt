@@ -11,31 +11,35 @@ import androidx.appcompat.widget.SearchView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.makashovadev.filmsearcher.MainActivity
 import com.makashovadev.filmsearcher.R
-import com.makashovadev.filmsearcher.data.Entity.MainRepository
+import com.makashovadev.filmsearcher.data.Interfaces.RepositoryInterface
 import com.makashovadev.filmsearcher.databinding.FragmentHomeBinding
 import com.makashovadev.filmsearcher.databinding.MergeHomeScreenContentBinding
 import com.makashovadev.filmsearcher.domain.Film
 import com.makashovadev.filmsearcher.touch_helper.SimpleItemTouchHelperCallback
 import com.makashovadev.filmsearcher.utils.AnimationHelper
-import com.makashovadev.filmsearcher.utils.diff_util.FilmDiff
 import com.makashovadev.filmsearcher.utils.diff_util.updateData
 import com.makashovadev.filmsearcher.view.rv_adapters.FilmListRecyclerAdapter
 import com.makashovadev.filmsearcher.view.rv_adapters.decorator.PaginationLoadingDecoration
 import com.makashovadev.filmsearcher.view.rv_adapters.decorator.TopSpacingItemDecoration
 import com.makashovadev.filmsearcher.viewmodel.HomeFragmentViewModel
+import jakarta.inject.Inject
 import java.util.Locale
 
-
 class HomeFragment : Fragment() {
+    private val viewModel by lazy {
+        ViewModelProvider.NewInstanceFactory().create(HomeFragmentViewModel::class.java)
+    }
+
+    // Внедрение интерфейса RepositoryInterface в класс HomeFragment
+    @Inject
+    lateinit var repository: RepositoryInterface
 
     private val binding: FragmentHomeBinding get() = _binding!!
     private var _binding: FragmentHomeBinding? = null
@@ -45,7 +49,7 @@ class HomeFragment : Fragment() {
 
     private lateinit var homeFragmentRoot: ConstraintLayout
 
-    private val repository = MainRepository()
+
     private lateinit var mainRecycler: RecyclerView
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
     private lateinit var searchView: SearchView
@@ -56,11 +60,6 @@ class HomeFragment : Fragment() {
     // magic... moments...
     private val TOTAL_PAGES = 500
     private var currentPage = PAGE_START
-
-    // Инициализируем (лениво) ViewModel
-    private val viewModel by lazy {
-        ViewModelProvider.NewInstanceFactory().create(HomeFragmentViewModel::class.java)
-    }
 
     // Создадим переменную, куда будем класть нашу БД из ViewModel, чтобы у нас не сломался поиск
     private var filmsDataBase = listOf<Film>()

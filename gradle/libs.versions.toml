@@ -38,7 +38,8 @@ dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", versi
 dagger-android-processor = { group = "com.google.dagger", name = "dagger-android-processor", version.ref = "dagger" }
 dagger-android-support = { group = "com.google.dagger", name = "dagger-android-support", version.ref = "dagger" }
 
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-com-google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "com-google-devtools-ksp"}
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+com-google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "com-google-devtools-ksp" }

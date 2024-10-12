@@ -1,53 +1,47 @@
 package com.makashovadev.filmsearcher.viewmodel
 
-import android.util.Log
-import android.view.View
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.makashovadev.filmsearcher.App
 import com.makashovadev.filmsearcher.domain.Film
 import com.makashovadev.filmsearcher.domain.Interactor
-import com.makashovadev.filmsearcher.utils.diff_util.updateData
+import jakarta.inject.Inject
 
 
-class HomeFragmentViewModel : ViewModel() {
-    val filmsListLiveData = MutableLiveData<List<Film>>()
+class HomeFragmentViewModel() : ViewModel() {
 
     //Инициализируем интерактор
-    private var interactor: Interactor = App.instance.interactor
+    @Inject
+    lateinit var interactor: Interactor
 
+    val filmsListLiveData = MutableLiveData<List<Film>>()
 
     init {
-        //filmsListLiveData.postValue(interactor.getFilmsDB())
-        interactor.getFilmsFromApi(1, object : ApiCallback {
-
-            override fun onSuccess(films: List<Film>) {
-                filmsListLiveData.postValue(films)
-            }
-
-            override fun onFailure() {
-            }
-        })
-
+        //И нам нужно при инициализации самого класса HomeFragmentViewModel вызвать метод inject
+        // на компоненте, передав туда ссылку на наш класс:
+        App.instance.dagger.inject(this)
+        loadPage(1)
     }
 
     //  загрузка страницы по номеру
     fun loadPage(page: Int) {
         interactor.getFilmsFromApi(page, object : ApiCallback {
-            override fun onSuccess(films: List<Film>) {
+            override fun onSuccess(films: List<Film>)
+            {
                 filmsListLiveData.postValue(films)
             }
+
             override fun onFailure() {
+                // Handle the failure case appropriately
             }
         })
     }
-
-
-
 
     // интерфейс, который будет отвечать за коллбэк
     interface ApiCallback {
         fun onSuccess(films: List<Film>)
         fun onFailure()
     }
+
 }
+
