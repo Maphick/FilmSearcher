@@ -3,6 +3,9 @@ package com.makashovadev.filmsearcher
 import android.app.Application
 import com.makashovadev.filmsearcher.di.AppComponent
 import com.makashovadev.filmsearcher.di.DaggerAppComponent
+import com.makashovadev.filmsearcher.di.modules.DatabaseModule
+import com.makashovadev.filmsearcher.di.modules.DomainModule
+import com.makashovadev.filmsearcher.di.modules.RemoteModule
 
 
 class App : Application() {
@@ -12,7 +15,11 @@ class App : Application() {
         super.onCreate()
         instance = this
         //Создаем компонент
-        dagger = DaggerAppComponent.create()
+        dagger = DaggerAppComponent.builder()
+            .remoteModule(RemoteModule())
+            .databaseModule(DatabaseModule())
+            .domainModule(DomainModule(this))
+            .build()
     }
 
     companion object {

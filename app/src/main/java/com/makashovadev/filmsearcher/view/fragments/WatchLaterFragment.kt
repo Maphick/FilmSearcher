@@ -30,7 +30,7 @@ class WatchLaterFragment : Fragment()
     fun Init(): View? {
         watchLaterBinding = FragmentWatchLaterBinding.inflate(layoutInflater)
         val view = watchLaterBinding.root
-        AnimationHelper.performFragmentCircularRevealAnimation(watchLaterBinding.root, requireActivity(), 1)
+        AnimationHelper.performFragmentCircularRevealAnimation(watchLaterBinding.root, requireActivity(), 3)
         return view
     }
 

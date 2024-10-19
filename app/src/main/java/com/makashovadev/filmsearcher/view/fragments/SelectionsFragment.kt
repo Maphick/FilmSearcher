@@ -30,7 +30,7 @@ class SelectionsFragment : Fragment() {
     fun Init(): View? {
         selectionsBinding = FragmentCollectionsBinding.inflate(layoutInflater)
         val view = selectionsBinding.root
-        AnimationHelper.performFragmentCircularRevealAnimation(selectionsBinding.root, requireActivity(), 1)
+        AnimationHelper.performFragmentCircularRevealAnimation(selectionsBinding.root, requireActivity(), 4)
         return view
     }
 

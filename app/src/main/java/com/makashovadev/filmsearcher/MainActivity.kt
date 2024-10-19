@@ -1,11 +1,15 @@
 package com.makashovadev.filmsearcher
 
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -15,6 +19,7 @@ import com.makashovadev.filmsearcher.view.fragments.DetailsFragment
 import com.makashovadev.filmsearcher.view.fragments.FavoritesFragment
 import com.makashovadev.filmsearcher.view.fragments.HomeFragment
 import com.makashovadev.filmsearcher.view.fragments.SelectionsFragment
+import com.makashovadev.filmsearcher.view.fragments.SettingsFragment
 import com.makashovadev.filmsearcher.view.fragments.WatchLaterFragment
 
 class MainActivity : AppCompatActivity() {
@@ -33,6 +38,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
         Init()
     }
+
 
     fun Init()
     {
@@ -101,6 +107,12 @@ class MainActivity : AppCompatActivity() {
                     val tag = "selections"
                     val fragment = checkFragmentExistence(tag)
                     changeFragment( fragment?: SelectionsFragment(), tag)
+                    true
+                }
+                R.id.settings -> {
+                    val tag = "settings"
+                    val fragment = checkFragmentExistence(tag)
+                    changeFragment( fragment?: SettingsFragment(), tag)
                     true
                 }
                 else -> false

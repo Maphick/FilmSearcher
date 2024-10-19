@@ -62,8 +62,14 @@ dependencies {
     implementation(libs.dagger.android)
     // Dagger-android-support
     implementation(libs.dagger.android.support)
+    implementation(libs.androidx.swiperefreshlayout)
     // Dagger-compiler
     ksp(libs.dagger.compiler)
+
+    //
+    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.extensions)
+    implementation(libs.lifecycle.viewmodel.ktx)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
