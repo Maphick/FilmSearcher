@@ -32,7 +32,7 @@ class FavoritesFragment : Fragment() {
     fun Init(): View? {
         favoritesBinding = FragmentFavoritesBinding.inflate(layoutInflater)
         val view = favoritesBinding.root
-        AnimationHelper.performFragmentCircularRevealAnimation(favoritesBinding.root, requireActivity(), 1)
+        AnimationHelper.performFragmentCircularRevealAnimation(favoritesBinding.root, requireActivity(), 2)
         return view
     }
 

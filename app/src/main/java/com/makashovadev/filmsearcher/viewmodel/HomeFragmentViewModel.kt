@@ -8,31 +8,30 @@ import com.makashovadev.filmsearcher.domain.Interactor
 import jakarta.inject.Inject
 
 
-class HomeFragmentViewModel() : ViewModel() {
+class HomeFragmentViewModel(
+) : ViewModel() {
+    val filmsListLiveData: MutableLiveData<List<Film>> = MutableLiveData()
 
     //Инициализируем интерактор
     @Inject
     lateinit var interactor: Interactor
 
-    val filmsListLiveData = MutableLiveData<List<Film>>()
 
     init {
         //И нам нужно при инициализации самого класса HomeFragmentViewModel вызвать метод inject
         // на компоненте, передав туда ссылку на наш класс:
         App.instance.dagger.inject(this)
-        loadPage(1)
+        getFilms(1)
     }
 
     //  загрузка страницы по номеру
-    fun loadPage(page: Int) {
+    fun getFilms(page: Int) {
         interactor.getFilmsFromApi(page, object : ApiCallback {
-            override fun onSuccess(films: List<Film>)
-            {
+            override fun onSuccess(films: List<Film>) {
                 filmsListLiveData.postValue(films)
             }
 
             override fun onFailure() {
-                // Handle the failure case appropriately
             }
         })
     }
@@ -42,6 +41,7 @@ class HomeFragmentViewModel() : ViewModel() {
         fun onSuccess(films: List<Film>)
         fun onFailure()
     }
+
 
 }
 

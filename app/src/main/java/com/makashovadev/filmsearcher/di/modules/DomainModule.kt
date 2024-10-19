@@ -1,15 +1,35 @@
 package com.makashovadev.filmsearcher.di.modules
 
+import android.content.Context
+import com.makashovadev.filmsearcher.data.Entity.MainRepository
 import com.makashovadev.filmsearcher.data.Interfaces.InteractorInterface
+import com.makashovadev.filmsearcher.data.Interfaces.TmdbApi
+import com.makashovadev.filmsearcher.data.settings.PreferenceProvider
 import com.makashovadev.filmsearcher.domain.Interactor
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import jakarta.inject.Singleton
 
 @Module
-abstract class DomainModule {
-    @Binds
+//Передаем контекст для SharedPreferences через конструктор
+class DomainModule(val context: Context) {
+    //Нам нужно контекст как-то провайдить, поэтому создаем такой метод
+    @Provides
+    fun provideContext() = context
+
     @Singleton
-    abstract fun bindInteractor(interactor: Interactor): InteractorInterface
+    @Provides
+    //Создаем экземпляр SharedPreferences
+    fun providePreferences(context: Context) = PreferenceProvider(context)
+
+    @Singleton
+    @Provides
+    fun provideInteractor(
+        repository: MainRepository,
+        tmdbApi: TmdbApi,
+        preferenceProvider: PreferenceProvider
+    ) = Interactor(repo = repository, retrofitService = tmdbApi, preferences = preferenceProvider)
+
 }
 

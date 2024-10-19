@@ -11,11 +11,13 @@ import androidx.appcompat.widget.SearchView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.makashovadev.filmsearcher.MainActivity
 import com.makashovadev.filmsearcher.R
 import com.makashovadev.filmsearcher.data.Interfaces.RepositoryInterface
@@ -53,6 +55,7 @@ class HomeFragment : Fragment() {
     private lateinit var mainRecycler: RecyclerView
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
     private lateinit var searchView: SearchView
+    private lateinit var pullToRefresh: SwipeRefreshLayout
     private lateinit var mAdapter: SimpleCursorAdapter
 
     val PAGE_START: Int = 1
@@ -103,9 +106,25 @@ class HomeFragment : Fragment() {
         InitMAdapter()
         RecyclerViewSetScroollListener()
         initSearchView()
-        // подпишемся на изменения этой View Model
-        viewModel.filmsListLiveData.observe(viewLifecycleOwner) { newData ->
-            updateData(newData, filmsAdapter)
+        initPullToRefresh()
+        //Кладем нашу БД в RV
+        viewModel.filmsListLiveData.observe(viewLifecycleOwner, Observer<List<Film>> {
+            filmsDataBase = it
+            updateData(it, filmsAdapter)
+            //filmsAdapter.addItems(it)
+        })
+    }
+
+    private fun initPullToRefresh() {
+        pullToRefresh = myIncludeLayoutBinding.pullToRefresh
+        //Вешаем слушатель, чтобы вызвался pull to refresh
+        pullToRefresh.setOnRefreshListener {
+            //Чистим адаптер(items нужно будет сделать паблик или создать для этого публичный метод)
+            filmsAdapter.clearItems()
+            //Делаем новый запрос фильмов на сервер
+            viewModel.getFilms(1)
+            //Убираем крутящееся колечко
+            pullToRefresh.isRefreshing = false
         }
     }
 
@@ -146,6 +165,7 @@ class HomeFragment : Fragment() {
                 }
                 //Добавляем в адаптер
                 filmsAdapter.addItems(result)
+                //mainRecycler.getRecycledViewPool().clear();
                 updateData(result as ArrayList, filmsAdapter)
                 return true
             }
@@ -231,11 +251,10 @@ class HomeFragment : Fragment() {
     }
 
 
+
     // загрузка страницы с номером page
     fun downloadAnyPage(page: Int) {
-        viewModel.loadPage(page)
+        viewModel.getFilms(page)
     }
 
 }
-
-

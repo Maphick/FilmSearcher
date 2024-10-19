@@ -15,6 +15,11 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
     //Здесь у нас хранится список элементов для RV
     private var items = mutableListOf<Film>()
 
+    fun clearItems()
+    {
+        items.clear()
+    }
+
     fun getItems(): List<Film> {
         return items
     }

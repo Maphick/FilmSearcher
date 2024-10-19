@@ -4,6 +4,7 @@ import com.makashovadev.filmsearcher.di.modules.DomainModule
 import com.makashovadev.filmsearcher.di.modules.DatabaseModule
 import com.makashovadev.filmsearcher.di.modules.RemoteModule
 import com.makashovadev.filmsearcher.viewmodel.HomeFragmentViewModel
+import com.makashovadev.filmsearcher.viewmodel.SettingsFragmentViewModel
 import dagger.Component
 import jakarta.inject.Singleton
 
@@ -14,10 +15,16 @@ import jakarta.inject.Singleton
         RemoteModule::class,
         DatabaseModule::class,
         DomainModule::class,
+       // ViewModelModule::class
     ]
 )
+
 interface AppComponent {
-    //метод для того, чтобы внедрять зависимости в HomeFragmentViewModel
+    //метод для того, чтобы появилась возможность внедрять зависимости в HomeFragmentViewModel
     fun inject(homeFragmentViewModel: HomeFragmentViewModel)
+    //метод для того, чтобы появилась возможность внедрять зависимости в SettingsFragmentViewModel
+    fun inject(settingsFragmentViewModel: SettingsFragmentViewModel)
 }
+
+
 
