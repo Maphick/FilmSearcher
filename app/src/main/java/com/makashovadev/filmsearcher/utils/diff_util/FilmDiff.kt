@@ -31,8 +31,14 @@ fun updateData(newList: List<Film>, adapter: FilmListRecyclerAdapter) {
     val oldList: java.util.ArrayList<Film> = adapter.getItems() as java.util.ArrayList<Film>
     val diff = FilmDiff(oldList, newList)
     val diffResult = DiffUtil.calculateDiff(diff)
-    oldList.addAll(newList)
-    adapter.setItems(oldList)
+   // oldList.addAll(newList)
+    //adapter.setItems(oldList)
+
+    adapter.setItems(newList) // Set the new list directly
     diffResult.dispatchUpdatesTo(adapter)
 }
+
+
+
+
 
