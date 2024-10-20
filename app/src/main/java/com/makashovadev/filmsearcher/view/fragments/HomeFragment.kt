@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.makashovadev.filmsearcher.MainActivity
 import com.makashovadev.filmsearcher.R
+import com.makashovadev.filmsearcher.data.Entity.MainRepository
 import com.makashovadev.filmsearcher.data.Interfaces.RepositoryInterface
 import com.makashovadev.filmsearcher.databinding.FragmentHomeBinding
 import com.makashovadev.filmsearcher.databinding.MergeHomeScreenContentBinding
@@ -38,10 +39,6 @@ class HomeFragment : Fragment() {
     private val viewModel by lazy {
         ViewModelProvider.NewInstanceFactory().create(HomeFragmentViewModel::class.java)
     }
-
-    // Внедрение интерфейса RepositoryInterface в класс HomeFragment
-    @Inject
-    lateinit var repository: RepositoryInterface
 
     private val binding: FragmentHomeBinding get() = _binding!!
     private var _binding: FragmentHomeBinding? = null
@@ -69,11 +66,12 @@ class HomeFragment : Fragment() {
         //Используем backing field
         set(value) {
             //Если придет такое же значение, то мы выходим из метода
-            //if (field == value) return
+            if (field == value) return
             //Если пришло другое значение, то кладем его в переменную
             field = value
             //Обновляем RV адаптер
-            filmsAdapter.addItems(field)
+            //filmsAdapter.addItems(field)
+            updateData(field, filmsAdapter)
         }
 
 
@@ -110,8 +108,6 @@ class HomeFragment : Fragment() {
         //Кладем нашу БД в RV
         viewModel.filmsListLiveData.observe(viewLifecycleOwner, Observer<List<Film>> {
             filmsDataBase = it
-            updateData(it, filmsAdapter)
-            //filmsAdapter.addItems(it)
         })
     }
 
@@ -119,8 +115,10 @@ class HomeFragment : Fragment() {
         pullToRefresh = myIncludeLayoutBinding.pullToRefresh
         //Вешаем слушатель, чтобы вызвался pull to refresh
         pullToRefresh.setOnRefreshListener {
+            // Clear both the adapter and the database
             //Чистим адаптер(items нужно будет сделать паблик или создать для этого публичный метод)
-            filmsAdapter.clearItems()
+            //filmsAdapter.clearItems()
+            filmsDataBase = emptyList()
             //Делаем новый запрос фильмов на сервер
             viewModel.getFilms(1)
             //Убираем крутящееся колечко
@@ -154,18 +152,18 @@ class HomeFragment : Fragment() {
             override fun onQueryTextChange(newText: String): Boolean {
                 //Если ввод пуст то вставляем в адаптер всю БД
                 if (newText.isEmpty()) {
-                    filmsAdapter.addItems(repository.filmsDataBase)
+                    //filmsAdapter.addItems(filmsDataBase)
+                    updateData(filmsDataBase, filmsAdapter)
+                    //filmsAdapter.addItems(repository.filmsDataBase)
                     return true
                 }
                 //Фильтруем список на поискк подходящих сочетаний
-                val result = repository.filmsDataBase.filter {
+                val result = filmsDataBase.filter {
                     //Чтобы все работало правильно, нужно и запрос, и имя фильма приводить к нижнему регистру
                     it.title.toLowerCase(Locale.getDefault())
                         .contains(newText.toLowerCase(Locale.getDefault()))
                 }
                 //Добавляем в адаптер
-                filmsAdapter.addItems(result)
-                //mainRecycler.getRecycledViewPool().clear();
                 updateData(result as ArrayList, filmsAdapter)
                 return true
             }
@@ -204,9 +202,10 @@ class HomeFragment : Fragment() {
             val linearSnapHelper = LinearSnapHelper()
             linearSnapHelper.attachToRecyclerView(this)
             // swipe + drag&drop
-            val callback = SimpleItemTouchHelperCallback(this.adapter as FilmListRecyclerAdapter)
+            /*val callback = SimpleItemTouchHelperCallback(this.adapter as FilmListRecyclerAdapter)
             val touchHelper = ItemTouchHelper(callback)
             touchHelper.attachToRecyclerView(this)
+             */
         }
     }
 
@@ -249,7 +248,6 @@ class HomeFragment : Fragment() {
         }
         mainRecycler.setOnScrollListener(scrollListener)
     }
-
 
 
     // загрузка страницы с номером page
