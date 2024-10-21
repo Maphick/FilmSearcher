@@ -26,12 +26,20 @@ class HomeFragmentViewModel(
 
     //  загрузка страницы по номеру
     fun getFilms(page: Int) {
+        // появилась сеть
         interactor.getFilmsFromApi(page, object : ApiCallback {
             override fun onSuccess(films: List<Film>) {
+                // удалить фильмы из БД
+                //interactor.removeFilmsFromDB()
                 filmsListLiveData.postValue(films)
             }
 
+            // коллбэк от Retrofit onFailure, вызывается, когда, например, возникают проблемы с Сетью
             override fun onFailure() {
+                // кладем фильмы из БД в LiveData, чтобы на UI у нас появился список фильмов:
+                //filmsListLiveData.postValue(interactor.getFilmsFromDB())
+                // возвращаем только фильмы с высоким рейтингом
+                filmsListLiveData.postValue(interactor.getHighRatingFilmsFromDB(HIGH_RAITING))
             }
         })
     }
@@ -42,6 +50,10 @@ class HomeFragmentViewModel(
         fun onFailure()
     }
 
+
+    companion object {
+        const val HIGH_RAITING = 7.0
+    }
 
 }
 

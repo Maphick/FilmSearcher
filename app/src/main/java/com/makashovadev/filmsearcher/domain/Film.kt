@@ -6,7 +6,7 @@ import android.os.Parcelable
 // класс Film, который мы кладем в интерактор
 //@Parcelize
 data class Film(
-    var id: Int = 0,
+    //var id: Int = 0,
     val title: String,
     val poster: String, //У нас будет приходить ссылка на картинку, так что теперь это String
     val description: String,
@@ -14,7 +14,7 @@ data class Film(
     var isInFavorites: Boolean = false
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readInt(),
+        //parcel.readInt(),
         parcel.readString().toString(),
         parcel.readString().toString(),
         parcel.readString().toString()
