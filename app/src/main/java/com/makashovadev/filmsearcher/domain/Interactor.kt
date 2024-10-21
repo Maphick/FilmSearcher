@@ -30,10 +30,18 @@ class Interactor @Inject constructor(
             page
         ).enqueue(object : Callback<TmdbResultsDto> {
             override fun onResponse(call: Call<TmdbResultsDto>, response: Response<TmdbResultsDto>) {
-                //При успехе мы вызываем метод передаем onSuccess и в этот коллбэк список фильмов
-                callback.onSuccess(Converter.convertApiListToDtoList(response.body()?.tmdbFilms))
+                // удаляем старые фильмы из БД
+                removeFilmsFromDB()
+                //При успехе мы вызываем метод, передаем onSuccess и в этот коллбэк список фильмов
+                val list = Converter.convertApiListToDtoList(response.body()?.tmdbFilms)
+                //Кладем фильмы в бд
+                list.forEach {
+                    // обновить фильм по имени
+                    repo.updateByTitle(film = it)
+                    //repo.putToDb(film = it)
+                }
+                callback.onSuccess(list)
             }
-
             override fun onFailure(call: Call<TmdbResultsDto>, t: Throwable) {
                 //В случае провала вызываем другой метод коллбека
                 callback.onFailure()
@@ -49,6 +57,14 @@ class Interactor @Inject constructor(
     fun getDefaultCategoryFromPreferences() = preferences.getDefaultCategory()
 
 
-    //fun getFilmsDB(): List<Film> = repo.filmsDataBase
+    // получить все фильмы из БД:
+    fun getFilmsFromDB(): List<Film> = repo.getAllFromDB()
+
+
+    // получить фильмы из БД с рейтингом > raitnig
+    fun getHighRatingFilmsFromDB(raitnig: Double): List<Film> = repo.getHighRating(raitnig = raitnig)
+
+    // удаление фильмов из БД
+    fun removeFilmsFromDB() = repo.removeAllFromDB()
 }
 
