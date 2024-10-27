@@ -4,7 +4,7 @@ package com.makashovadev.filmsearcher.touch_helper
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.makashovadev.filmsearcher.domain.Film
+import com.makashovadev.filmsearcher.data.Entity.Film
 import com.makashovadev.filmsearcher.utils.diff_util.updateData
 import com.makashovadev.filmsearcher.view.rv_adapters.FilmListRecyclerAdapter
 import java.util.Collections

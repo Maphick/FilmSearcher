@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.plugin.parcelize)
     alias(libs.plugins.com.google.devtools.ksp)
 }
 
@@ -14,10 +15,23 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments["room.schemaLocation"] = "/Users/bear/AndroidStudioProjects/FilmSearcher/app/src/main/java/com/makashovadev/filmsearcher/schemas".toString()
+                //arguments["room.schemaLocation"] += "${projectDir.path}/schemas".toString()
+            }
+        }
 
+       // javaCompileOptions {
+       //     annotationProcessorOptions {
+       //         arguments ["room.schemaLocation"] += "$projectDir/schemas".toString()
+//}
+       // }
+    }
+    buildFeatures{
+        viewBinding = true
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -26,9 +40,6 @@ android {
                 "proguard-rules.pro"
             )
         }
-    }
-    buildFeatures{
-        viewBinding = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -66,7 +77,11 @@ dependencies {
     // Dagger-compiler
     ksp(libs.dagger.compiler)
 
-    //
+    // ROOM
+    implementation(libs.room.runtime)
+    implementation(libs.androidx.adapters)
+    ksp(libs.room.compiler)
+
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.extensions)
     implementation(libs.lifecycle.viewmodel.ktx)

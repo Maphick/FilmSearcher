@@ -14,7 +14,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.makashovadev.filmsearcher.R
 import com.makashovadev.filmsearcher.data.Entity.ApiConstants
-import com.makashovadev.filmsearcher.domain.Film
+import com.makashovadev.filmsearcher.data.Entity.Film
 import com.makashovadev.filmsearcher.databinding.FragmentDetailsBinding
 
 class DetailsFragment : Fragment() {

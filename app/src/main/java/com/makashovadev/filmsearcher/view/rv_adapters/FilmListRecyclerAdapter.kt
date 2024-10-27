@@ -3,7 +3,7 @@ package com.makashovadev.filmsearcher.view.rv_adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.makashovadev.filmsearcher.domain.Film
+import com.makashovadev.filmsearcher.data.Entity.Film
 import com.makashovadev.filmsearcher.databinding.FilmItemBinding
 import com.makashovadev.filmsearcher.view.rv_viewholders.FilmViewHolder
 
