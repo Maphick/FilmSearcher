@@ -1,6 +1,6 @@
 package com.makashovadev.filmsearcher.utils
 
-import com.makashovadev.filmsearcher.domain.Film
+import com.makashovadev.filmsearcher.data.Entity.Film
 import com.makashovadev.filmsearcher.data.dto.TmdbFilm
 
 // с API приходит один объект, а в RV мы кладем список с другими объектами.

@@ -1,19 +1,13 @@
 package com.makashovadev.filmsearcher
 
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.makashovadev.filmsearcher.domain.Film
+import com.makashovadev.filmsearcher.data.Entity.Film
 import com.makashovadev.filmsearcher.databinding.ActivityMainBinding
 import com.makashovadev.filmsearcher.view.fragments.DetailsFragment
 import com.makashovadev.filmsearcher.view.fragments.FavoritesFragment
@@ -21,8 +15,12 @@ import com.makashovadev.filmsearcher.view.fragments.HomeFragment
 import com.makashovadev.filmsearcher.view.fragments.SelectionsFragment
 import com.makashovadev.filmsearcher.view.fragments.SettingsFragment
 import com.makashovadev.filmsearcher.view.fragments.WatchLaterFragment
+import com.makashovadev.filmsearcher.viewmodel.HomeFragmentViewModel
 
 class MainActivity : AppCompatActivity() {
+
+    //val mainActivityViewModel : HomeFragmentViewModel by viewModels()
+
     private lateinit var binding: ActivityMainBinding
     // фрагмент
     private lateinit var fragment_placeholder: FrameLayout
@@ -42,6 +40,7 @@ class MainActivity : AppCompatActivity() {
 
     fun Init()
     {
+
         // инициализация вепхнего меню
         //initTopAppBar()
         // инициализация нижнего меню

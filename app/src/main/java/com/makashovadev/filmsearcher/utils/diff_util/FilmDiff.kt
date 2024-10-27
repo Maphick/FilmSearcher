@@ -2,8 +2,7 @@ package com.makashovadev.filmsearcher.utils.diff_util
 
 import android.annotation.SuppressLint
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.DiffUtil.DiffResult
-import com.makashovadev.filmsearcher.domain.Film
+import com.makashovadev.filmsearcher.data.Entity.Film
 import com.makashovadev.filmsearcher.view.rv_adapters.FilmListRecyclerAdapter
 
 class FilmDiff(val oldList: List<Film>, val newList: List<Film>) :

@@ -13,26 +13,21 @@ import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.makashovadev.filmsearcher.MainActivity
 import com.makashovadev.filmsearcher.R
-import com.makashovadev.filmsearcher.data.Entity.MainRepository
-import com.makashovadev.filmsearcher.data.Interfaces.RepositoryInterface
 import com.makashovadev.filmsearcher.databinding.FragmentHomeBinding
 import com.makashovadev.filmsearcher.databinding.MergeHomeScreenContentBinding
-import com.makashovadev.filmsearcher.domain.Film
-import com.makashovadev.filmsearcher.touch_helper.SimpleItemTouchHelperCallback
+import com.makashovadev.filmsearcher.data.Entity.Film
 import com.makashovadev.filmsearcher.utils.AnimationHelper
 import com.makashovadev.filmsearcher.utils.diff_util.updateData
 import com.makashovadev.filmsearcher.view.rv_adapters.FilmListRecyclerAdapter
 import com.makashovadev.filmsearcher.view.rv_adapters.decorator.PaginationLoadingDecoration
 import com.makashovadev.filmsearcher.view.rv_adapters.decorator.TopSpacingItemDecoration
 import com.makashovadev.filmsearcher.viewmodel.HomeFragmentViewModel
-import jakarta.inject.Inject
 import java.util.Locale
 
 class HomeFragment : Fragment() {
@@ -48,18 +43,11 @@ class HomeFragment : Fragment() {
 
     private lateinit var homeFragmentRoot: ConstraintLayout
 
-
     private lateinit var mainRecycler: RecyclerView
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
     private lateinit var searchView: SearchView
     private lateinit var pullToRefresh: SwipeRefreshLayout
     private lateinit var mAdapter: SimpleCursorAdapter
-
-    val PAGE_START: Int = 1
-
-    // magic... moments...
-    private val TOTAL_PAGES = 500
-    private var currentPage = PAGE_START
 
     // Создадим переменную, куда будем класть нашу БД из ViewModel, чтобы у нас не сломался поиск
     private var filmsDataBase = listOf<Film>()
@@ -69,8 +57,6 @@ class HomeFragment : Fragment() {
             if (field == value) return
             //Если пришло другое значение, то кладем его в переменную
             field = value
-            //Обновляем RV адаптер
-            //filmsAdapter.addItems(field)
             updateData(field, filmsAdapter)
         }
 
@@ -116,11 +102,11 @@ class HomeFragment : Fragment() {
         //Вешаем слушатель, чтобы вызвался pull to refresh
         pullToRefresh.setOnRefreshListener {
             // Clear both the adapter and the database
-            //Чистим адаптер(items нужно будет сделать паблик или создать для этого публичный метод)
+            //Чистим адаптер
             //filmsAdapter.clearItems()
             filmsDataBase = emptyList()
-            //Делаем новый запрос фильмов на сервер
-            viewModel.getFilms(1)
+            //Делаем новый запрос фильмов на сервер или в БД
+            viewModel.loadMovies(viewModel.currentPage)
             //Убираем крутящееся колечко
             pullToRefresh.isRefreshing = false
         }
@@ -152,9 +138,7 @@ class HomeFragment : Fragment() {
             override fun onQueryTextChange(newText: String): Boolean {
                 //Если ввод пуст то вставляем в адаптер всю БД
                 if (newText.isEmpty()) {
-                    //filmsAdapter.addItems(filmsDataBase)
                     updateData(filmsDataBase, filmsAdapter)
-                    //filmsAdapter.addItems(repository.filmsDataBase)
                     return true
                 }
                 //Фильтруем список на поискк подходящих сочетаний
@@ -226,21 +210,21 @@ class HomeFragment : Fragment() {
                     (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                 //проверяем, грузим мы что-то или нет
                 if (!isLoading) {
-                    if (visibleItemCount + firstVisibleItems >= totalItemCount) {
+                    if (visibleItemCount + firstVisibleItems + 5  >= totalItemCount) {
                         //ставим флаг, что мы попросили еще элементы
                         isLoading = true
                         //Вызывает загрузку данных в RecyclerView
-                        currentPage += 1
-                        if (currentPage <= TOTAL_PAGES) {
+                        viewModel.currentPage += 1
+                        if (viewModel.currentPage <= HomeFragmentViewModel.TOTAL_PAGES) {
                             // загрузка следующей страницы
-                            downloadAnyPage(currentPage)
+                            downloadAnyPage(viewModel.currentPage)
                             //isLoading = false
                             // задержка для демонстрации загрузки
                             //  если разблокировать - можно увидеть прогресс бар =)
                             Handler().postDelayed({
                                 // Оповещение RecyclerView об изменении данных с помощью DiffUtil.
                                 isLoading = false
-                            }, 2000)
+                            }, 500)
                         }
                     }
                 }

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.makashovadev.filmsearcher.utils.AnimationHelper
 import com.makashovadev.filmsearcher.MainActivity
-import com.makashovadev.filmsearcher.domain.Film
+import com.makashovadev.filmsearcher.data.Entity.Film
 import com.makashovadev.filmsearcher.databinding.FragmentFavoritesBinding
 import com.makashovadev.filmsearcher.view.rv_adapters.decorator.TopSpacingItemDecoration
 import com.makashovadev.filmsearcher.view.rv_adapters.FilmListRecyclerAdapter

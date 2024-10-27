@@ -32,10 +32,31 @@ class PreferenceProvider(context: Context) {
         var str = preference.getString(KEY_DEFAULT_CATEGORY, DEFAULT_CATEGORY) ?: DEFAULT_CATEGORY
         return str
     }
+
+
+    //Сохраняем время последнего обновления
+    fun saveLastUpdateTime(time: Long) {
+        preference.edit { putLong(LAST_DOWNLOAD_TIME_KEY, time) }
+    }
+
+    // Забираем время последнего обновления
+    fun getLastUpdateTime(): Long {
+        var str = preference.getLong(LAST_DOWNLOAD_TIME_KEY, DEFAULT_DOWNLOAD_TIME) ?: DEFAULT_DOWNLOAD_TIME
+        return str
+    }
+
+
+
+
+
     //Ключи для наших настроек, по ним мы их будем получать
     companion object {
         private const val KEY_FIRST_LAUNCH = "first_launch"
         private const val KEY_DEFAULT_CATEGORY = "default_category"
         private const val DEFAULT_CATEGORY = "popular"
+        // ключ для хранения последней загрузки данных в шаред преференис
+        private const val LAST_DOWNLOAD_TIME_KEY = "last_download_time"
+        private const val DEFAULT_DOWNLOAD_TIME = 0L
+
     }
 }

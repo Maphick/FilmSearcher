@@ -7,16 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.makashovadev.filmsearcher.utils.AnimationHelper
-import com.makashovadev.filmsearcher.MainActivity
 import com.makashovadev.filmsearcher.R
-import com.makashovadev.filmsearcher.domain.Film
-import com.makashovadev.filmsearcher.databinding.FragmentFavoritesBinding
 import com.makashovadev.filmsearcher.databinding.FragmentSettingsBinding
-import com.makashovadev.filmsearcher.view.rv_adapters.decorator.TopSpacingItemDecoration
-import com.makashovadev.filmsearcher.view.rv_adapters.FilmListRecyclerAdapter
 import com.makashovadev.filmsearcher.viewmodel.SettingsFragmentViewModel
 
 class SettingsFragment : Fragment() {
