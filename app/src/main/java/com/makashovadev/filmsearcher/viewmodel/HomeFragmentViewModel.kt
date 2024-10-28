@@ -2,6 +2,7 @@ package com.makashovadev.filmsearcher.viewmodel
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,7 +20,22 @@ import java.util.concurrent.TimeUnit
 
 class HomeFragmentViewModel(
 ) : ViewModel() {
-    val filmsListLiveData: MutableLiveData<List<Film>> = MutableLiveData()
+
+
+    val errorEvent = SingleLiveEvent<String>()
+
+    //  Ошибка получения данных с сервер
+    fun postError(){
+        errorEvent.postValue("Error receiving data from server")
+    }
+
+
+    // для показа прогресс-бара
+    // когда мы хотим его показывать, кладем true, а когда не хотим — false.
+    val showProgressBar: MutableLiveData<Boolean> = MutableLiveData()
+
+    val filmsListLiveData: LiveData<List<Film>>
+
     // текущая страница для пагинации
     var currentPage = START_PAGE
 
@@ -35,7 +51,9 @@ class HomeFragmentViewModel(
         App.instance.dagger.inject(this)
         // загрузка времени последнего обновления из шаред преференсис
         getLastUpdateTime()
+        filmsListLiveData = interactor.getFilmsFromDB()
         loadMovies(currentPage)
+        //getFilms(currentPage)
     }
 
     // загрузка страницы из сети или из БД, если не прошло 10мин
@@ -49,9 +67,9 @@ class HomeFragmentViewModel(
                 if (currentTime - (lastDownloadTime?:0) <= TimeUnit.MINUTES.toMillis(10))
                 {
                     // запрос в БД на получения фильмов из кэша в отдельном потоке:
-                    Executors.newSingleThreadExecutor().execute {
-                        filmsListLiveData.postValue(interactor.getFilmsFromDB())
-                    }
+                   // Executors.newSingleThreadExecutor().execute {
+                        //filmsListLiveData.postValue(interactor.getFilmsFromDB())
+                    //}
                 }
                 else {
                 // Если данные не кэшированы или устарели, необходимо извлечь из сети
@@ -61,28 +79,33 @@ class HomeFragmentViewModel(
                 }
             } catch (e: Exception) {
                 // Произошла ошибка, загрузка из кэша
-                Executors.newSingleThreadExecutor().execute {
-                    filmsListLiveData.postValue(interactor.getFilmsFromDB())
-                }
+                //Executors.newSingleThreadExecutor().execute {
+                    //filmsListLiveData.postValue(interactor.getFilmsFromDB())
+                //}
             }
     }
 
 
     //  загрузка страницы по номеру
     fun getFilms(page: Int) {
+        showProgressBar.postValue(true)
         // появилась сеть
         interactor.getFilmsFromApi(page, object : ApiCallback {
-            override fun onSuccess(films: List<Film>) {
-                filmsListLiveData.postValue(films)
+            override fun onSuccess() {
+                showProgressBar.postValue(false)
+                //filmsListLiveData.postValue(films)
             }
 
             // коллбэк от Retrofit onFailure, вызывается, когда, например, возникают проблемы с Сетью
             override fun onFailure() {
+                showProgressBar.postValue(false)
+                // показ тоста/снэкбара с предупреждением об ошибке получения данных с сервера
+                postError()
                 // коллбеке onFailure нужно обернуть запрос в БД на получения фильмов из кэша в
                 // отдельный поток:
-                Executors.newSingleThreadExecutor().execute {
-                    filmsListLiveData.postValue(interactor.getFilmsFromDB())
-                }
+                //Executors.newSingleThreadExecutor().execute {
+                    //filmsListLiveData.postValue(interactor.getFilmsFromDB())
+                //}
             }
         })
     }
@@ -106,7 +129,7 @@ class HomeFragmentViewModel(
 
     // интерфейс, который будет отвечать за коллбэк
     interface ApiCallback {
-        fun onSuccess(films: List<Film>)
+        fun onSuccess()
         fun onFailure()
     }
 

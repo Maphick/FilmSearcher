@@ -7,8 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CursorAdapter
+import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -42,6 +45,8 @@ class HomeFragment : Fragment() {
     private var _myIncludeLayoutBinding: MergeHomeScreenContentBinding? = null
 
     private lateinit var homeFragmentRoot: ConstraintLayout
+
+    private lateinit var progress_bar: ProgressBar
 
     private lateinit var mainRecycler: RecyclerView
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
@@ -91,10 +96,20 @@ class HomeFragment : Fragment() {
         RecyclerViewSetScroollListener()
         initSearchView()
         initPullToRefresh()
+        progress_bar = myIncludeLayoutBinding.progressBar
         //Кладем нашу БД в RV
         viewModel.filmsListLiveData.observe(viewLifecycleOwner, Observer<List<Film>> {
             filmsDataBase = it
         })
+
+        viewModel.showProgressBar.observe(viewLifecycleOwner, Observer<Boolean> {
+            progress_bar.isVisible = it
+        })
+
+        // подписываемся  на  ошибку получения данных с сервера
+        viewModel.errorEvent.observe(viewLifecycleOwner) {
+            Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun initPullToRefresh() {
@@ -106,7 +121,7 @@ class HomeFragment : Fragment() {
             //filmsAdapter.clearItems()
             filmsDataBase = emptyList()
             //Делаем новый запрос фильмов на сервер или в БД
-            viewModel.loadMovies(viewModel.currentPage)
+            //viewModel.loadMovies(viewModel.currentPage)
             //Убираем крутящееся колечко
             pullToRefresh.isRefreshing = false
         }
