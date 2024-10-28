@@ -100,6 +100,7 @@ class HomeFragment : Fragment() {
         //Кладем нашу БД в RV
         viewModel.filmsListLiveData.observe(viewLifecycleOwner, Observer<List<Film>> {
             filmsDataBase = it
+            filmsAdapter.addItems(it)
         })
 
         viewModel.showProgressBar.observe(viewLifecycleOwner, Observer<Boolean> {
@@ -116,12 +117,12 @@ class HomeFragment : Fragment() {
         pullToRefresh = myIncludeLayoutBinding.pullToRefresh
         //Вешаем слушатель, чтобы вызвался pull to refresh
         pullToRefresh.setOnRefreshListener {
-            // Clear both the adapter and the database
+            // Чистим адаптер и базу
             //Чистим адаптер
-            //filmsAdapter.clearItems()
-            filmsDataBase = emptyList()
+            //filmsDataBase = emptyList()
+            //filmsAdapter. clearItems()
             //Делаем новый запрос фильмов на сервер или в БД
-            //viewModel.loadMovies(viewModel.currentPage)
+            viewModel.loadMovies(viewModel.currentPage)
             //Убираем крутящееся колечко
             pullToRefresh.isRefreshing = false
         }
