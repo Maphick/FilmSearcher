@@ -1,5 +1,6 @@
 package com.makashovadev.filmsearcher.domain
 
+import androidx.lifecycle.LiveData
 import com.makashovadev.filmsearcher.data.Entity.API
 import com.makashovadev.filmsearcher.data.Entity.Film
 import com.makashovadev.filmsearcher.data.Entity.MainRepository
@@ -39,7 +40,7 @@ class Interactor @Inject constructor(
                 }
                 //Кладём фильмы в БД
                 repo.putToDb(list)
-                callback.onSuccess(list)
+                callback.onSuccess()
             }
             override fun onFailure(call: Call<TmdbResultsDto>, t: Throwable) {
                 //В случае провала вызываем другой метод коллбека
@@ -66,7 +67,7 @@ class Interactor @Inject constructor(
 
 
     // получить все фильмы из БД:
-    fun getFilmsFromDB(): List<Film> = repo.getAllFromDB()
+    fun getFilmsFromDB(): LiveData<List<Film>> = repo.getAllFromDB()
 
     // удалить все фильмы из базы
     fun clearFilmsFromDB() = repo.clearAll()

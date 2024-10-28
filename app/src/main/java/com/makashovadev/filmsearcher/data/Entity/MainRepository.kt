@@ -2,6 +2,7 @@ package com.makashovadev.filmsearcher.data.Entity
 
 import android.content.ContentValues
 import android.database.Cursor
+import androidx.lifecycle.LiveData
 import com.makashovadev.filmsearcher.data.DAO.FilmDao
 import com.makashovadev.filmsearcher.data.db.DatabaseHelper
 import java.util.concurrent.Executors
@@ -18,7 +19,7 @@ class MainRepository(private val filmDao: FilmDao) {
         }
     }
 
-    fun getAllFromDB(): List<Film> {
+    fun getAllFromDB(): LiveData<List<Film>> {
         return filmDao.getCachedFilms()
     }
 
