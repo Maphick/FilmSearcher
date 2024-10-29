@@ -26,7 +26,7 @@ class HomeFragmentViewModel(
 
     //  Ошибка получения данных с сервер
     fun postError(){
-        errorEvent.postValue("Error receiving data from server")
+        errorEvent.postValue("Error receiving films from server")
     }
 
 
