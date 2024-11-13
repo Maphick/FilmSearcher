@@ -5,6 +5,7 @@ import android.database.Cursor
 import androidx.lifecycle.LiveData
 import com.makashovadev.filmsearcher.data.DAO.FilmDao
 import com.makashovadev.filmsearcher.data.db.DatabaseHelper
+import kotlinx.coroutines.flow.Flow
 import java.util.concurrent.Executors
 
 
@@ -12,22 +13,18 @@ import java.util.concurrent.Executors
 class MainRepository(private val filmDao: FilmDao) {
 
     fun putToDb(films: List<Film>) {
-        //Запросы в БД должны быть в отдельном потоке
-        Executors.newSingleThreadExecutor().execute {
-            //filmDao.deleteAll()
-            filmDao.insertAll(films)
-        }
+        // мы теперь кладем фильмы в БД в Корутине, то есть асинхронно, поэтому в методе putToDb
+        // можно убрать использование Executor-a.
+        filmDao.insertAll(films)
     }
 
-    fun getAllFromDB(): LiveData<List<Film>> {
+    fun getAllFromDB(): Flow<List<Film>> {
         return filmDao.getCachedFilms()
     }
 
 
     fun clearAll() {
         //Запросы в БД должны быть в отдельном потоке
-        Executors.newSingleThreadExecutor().execute {
-            //filmDao.deleteAll()
-        }
+        //filmDao.deleteAll()
     }
 }

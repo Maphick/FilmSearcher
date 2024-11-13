@@ -1,40 +1,36 @@
 package com.makashovadev.filmsearcher.viewmodel
 
-import android.content.Context
-import android.content.SharedPreferences
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.makashovadev.filmsearcher.App
 import com.makashovadev.filmsearcher.data.Entity.Film
 import com.makashovadev.filmsearcher.domain.Interactor
 import jakarta.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import java.util.Calendar
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 
 class HomeFragmentViewModel(
 ) : ViewModel() {
 
-
     val errorEvent = SingleLiveEvent<String>()
 
     //  Ошибка получения данных с сервер
-    fun postError(){
+    fun postError() {
         errorEvent.postValue("Error receiving films from server")
     }
 
 
     // для показа прогресс-бара
     // когда мы хотим его показывать, кладем true, а когда не хотим — false.
-    val showProgressBar: MutableLiveData<Boolean> = MutableLiveData()
+    // Канал у нас готов, теперь ссылку на него нужно пробросить во View модель:
+    val showProgressBar: Channel<Boolean>
 
-    val filmsListLiveData: LiveData<List<Film>>
+    // ʕ•ᴥ•ʔ
+    val filmsListData: Flow<List<Film>>
 
     // текущая страница для пагинации
     var currentPage = START_PAGE
@@ -42,6 +38,7 @@ class HomeFragmentViewModel(
     //Инициализируем интерактор
     @Inject
     lateinit var interactor: Interactor
+
     // время последнего обновления
     val lastDownloadTimeLifeData: MutableLiveData<Long> = MutableLiveData()
 
@@ -51,63 +48,45 @@ class HomeFragmentViewModel(
         App.instance.dagger.inject(this)
         // загрузка времени последнего обновления из шаред преференсис
         getLastUpdateTime()
-        filmsListLiveData = interactor.getFilmsFromDB()
+        showProgressBar = interactor.progressBarState
+        filmsListData = interactor.getFilmsFromDB()
         loadMovies(currentPage)
         //getFilms(currentPage)
     }
 
     // загрузка страницы из сети или из БД, если не прошло 10мин
     fun loadMovies(page: Int) {
-            try {
-                // Проверка, кэшированы ли данные и являются ли они действительными.
-                // получить последнее время обновления из шаред преференсис
-                val lastDownloadTime = lastDownloadTimeLifeData.value
-                val currentTime = Calendar.getInstance().timeInMillis
-                // Если прошло не более 10 минут с момента последней загрузки
-                if (currentTime - (lastDownloadTime?:0) <= TimeUnit.MINUTES.toMillis(10))
-                {
-                    // запрос в БД на получения фильмов из кэша в отдельном потоке:
-                   // Executors.newSingleThreadExecutor().execute {
-                        //filmsListLiveData.postValue(interactor.getFilmsFromDB())
-                    //}
-                }
-                else {
+        try {
+            // Проверка, кэшированы ли данные и являются ли они действительными.
+            // получить последнее время обновления из шаред преференсис
+            val lastDownloadTime = lastDownloadTimeLifeData.value
+            val currentTime = Calendar.getInstance().timeInMillis
+            // Если прошло не более 10 минут с момента последней загрузки
+            if (currentTime - (lastDownloadTime ?: 0) <= TimeUnit.MINUTES.toMillis(10)) {
+                // запрос в БД на получения фильмов из кэша в отдельном потоке:
+                // Executors.newSingleThreadExecutor().execute {
+                //filmsListLiveData.postValue(interactor.getFilmsFromDB())
+                //}
+            } else {
                 // Если данные не кэшированы или устарели, необходимо извлечь из сети
                 getFilms(page)
                 // Сохранить теущее время в SharedPreferences
-                putLastUpdateTime(currentTime?:0)
-                }
-            } catch (e: Exception) {
-                // Произошла ошибка, загрузка из кэша
-                //Executors.newSingleThreadExecutor().execute {
-                    //filmsListLiveData.postValue(interactor.getFilmsFromDB())
-                //}
+                putLastUpdateTime(currentTime ?: 0)
             }
+        } catch (e: Exception) {
+            // Произошла ошибка, загрузка из кэша
+            //Executors.newSingleThreadExecutor().execute {
+            //filmsListLiveData.postValue(interactor.getFilmsFromDB())
+            //}
+        }
     }
 
 
     //  загрузка страницы по номеру
     fun getFilms(page: Int) {
-        showProgressBar.postValue(true)
+        //showProgressBar.postValue(true)
         // появилась сеть
-        interactor.getFilmsFromApi(page, object : ApiCallback {
-            override fun onSuccess() {
-                showProgressBar.postValue(false)
-                //filmsListLiveData.postValue(films)
-            }
-
-            // коллбэк от Retrofit onFailure, вызывается, когда, например, возникают проблемы с Сетью
-            override fun onFailure() {
-                showProgressBar.postValue(false)
-                // показ тоста/снэкбара с предупреждением об ошибке получения данных с сервера
-                postError()
-                // коллбеке onFailure нужно обернуть запрос в БД на получения фильмов из кэша в
-                // отдельный поток:
-                //Executors.newSingleThreadExecutor().execute {
-                    //filmsListLiveData.postValue(interactor.getFilmsFromDB())
-                //}
-            }
-        })
+        interactor.getFilmsFromApi(page)
     }
 
 
@@ -124,13 +103,6 @@ class HomeFragmentViewModel(
         interactor.saveLastUpdateTimeToPreferences(time)
         //И сразу забираем, чтобы сохранить состояние в модели
         getLastUpdateTime()
-    }
-
-
-    // интерфейс, который будет отвечать за коллбэк
-    interface ApiCallback {
-        fun onSuccess()
-        fun onFailure()
     }
 
 

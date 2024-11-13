@@ -31,6 +31,11 @@ import com.makashovadev.filmsearcher.view.rv_adapters.FilmListRecyclerAdapter
 import com.makashovadev.filmsearcher.view.rv_adapters.decorator.PaginationLoadingDecoration
 import com.makashovadev.filmsearcher.view.rv_adapters.decorator.TopSpacingItemDecoration
 import com.makashovadev.filmsearcher.viewmodel.HomeFragmentViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 class HomeFragment : Fragment() {
@@ -53,6 +58,8 @@ class HomeFragment : Fragment() {
     private lateinit var searchView: SearchView
     private lateinit var pullToRefresh: SwipeRefreshLayout
     private lateinit var mAdapter: SimpleCursorAdapter
+
+    private lateinit var scope: CoroutineScope
 
     // Создадим переменную, куда будем класть нашу БД из ViewModel, чтобы у нас не сломался поиск
     private var filmsDataBase = listOf<Film>()
@@ -98,14 +105,32 @@ class HomeFragment : Fragment() {
         initPullToRefresh()
         progress_bar = myIncludeLayoutBinding.progressBar
         //Кладем нашу БД в RV
-        viewModel.filmsListLiveData.observe(viewLifecycleOwner, Observer<List<Film>> {
-            filmsDataBase = it
-            filmsAdapter.addItems(it)
-        })
-
-        viewModel.showProgressBar.observe(viewLifecycleOwner, Observer<Boolean> {
-            progress_bar.isVisible = it
-        })
+        // Мы используем Disptchers.IO, потому как мы и совершаем операции ввода-вывода
+        scope = CoroutineScope(Dispatchers.IO).also { scope ->
+            scope.launch {
+                viewModel.filmsListData.collect {
+                    // поскольку у нас это все возвращается на UI, мы при помощи
+                    // withContext(Dispatchers.Main) возвращаем все в главный поток, в противном
+                    // случае у нас будет ошибка.
+                    withContext(Dispatchers.Main) {
+                        filmsAdapter.addItems(it)
+                        filmsDataBase = it
+                    }
+                }
+            }
+            // И на UI уже получать изменения. Мы их будем делать в том же скоупе, но в отдельной Корутине:
+            scope.launch {
+                // Получаем мы значение в цикле, и когда фрагмент не будет показываться на экране,
+                // нам нужно эту Корутину остановить, но поскольку мы все запускаем в одном скоупе,
+                // а мы уже написали логику его завершения в методе, то у нас все схвачено, все
+                // завершится при вызове метода onStop.
+                for (element in viewModel.showProgressBar) {
+                    launch(Dispatchers.Main) {
+                        progress_bar.isVisible = element
+                    }
+                }
+            }
+        }
 
         // подписываемся  на  ошибку получения данных с сервера
         viewModel.errorEvent.observe(viewLifecycleOwner) {
@@ -226,7 +251,7 @@ class HomeFragment : Fragment() {
                     (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                 //проверяем, грузим мы что-то или нет
                 if (!isLoading) {
-                    if (visibleItemCount + firstVisibleItems + 5  >= totalItemCount) {
+                    if (visibleItemCount + firstVisibleItems + 5 >= totalItemCount) {
                         //ставим флаг, что мы попросили еще элементы
                         isLoading = true
                         //Вызывает загрузку данных в RecyclerView
@@ -253,6 +278,13 @@ class HomeFragment : Fragment() {
     // загрузка страницы с номером page
     fun downloadAnyPage(page: Int) {
         viewModel.getFilms(page)
+    }
+
+    // Чтобы у нас Корутины не продолжали работать, когда наш фрагмент будет уничтожен, в
+    // переопределенном методе onStop мы наш скоуп отменяем:
+    override fun onStop() {
+        super.onStop()
+        scope.cancel()
     }
 
 }
