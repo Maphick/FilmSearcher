@@ -80,6 +80,8 @@ dependencies {
     // ROOM
     implementation(libs.room.runtime)
     implementation(libs.androidx.adapters)
+    //  coroutines + room
+    implementation(libs.room.ktx)
     ksp(libs.room.compiler)
 
     implementation(libs.lifecycle.viewmodel)
