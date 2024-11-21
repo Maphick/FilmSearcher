@@ -1,8 +1,10 @@
 package com.makashovadev.filmsearcher.view.fragments
 
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,17 +22,23 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.makashovadev.filmsearcher.App
 import com.makashovadev.filmsearcher.MainActivity
 import com.makashovadev.filmsearcher.R
 import com.makashovadev.filmsearcher.databinding.FragmentHomeBinding
 import com.makashovadev.filmsearcher.databinding.MergeHomeScreenContentBinding
 import com.makashovadev.filmsearcher.data.Entity.Film
+import com.makashovadev.filmsearcher.di.AppComponent
 import com.makashovadev.filmsearcher.utils.AnimationHelper
 import com.makashovadev.filmsearcher.utils.diff_util.updateData
 import com.makashovadev.filmsearcher.view.rv_adapters.FilmListRecyclerAdapter
 import com.makashovadev.filmsearcher.view.rv_adapters.decorator.PaginationLoadingDecoration
 import com.makashovadev.filmsearcher.view.rv_adapters.decorator.TopSpacingItemDecoration
 import com.makashovadev.filmsearcher.viewmodel.HomeFragmentViewModel
+import com.makashovadev.filmsearcher.viewmodel.HomeFragmentViewModelFactory
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
+import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -39,9 +47,13 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 
 class HomeFragment : Fragment() {
-    private val viewModel by lazy {
-        ViewModelProvider.NewInstanceFactory().create(HomeFragmentViewModel::class.java)
-    }
+
+    // Внедрение ViewModel в наш Fragment
+    // В вашем Fragment мы можем внедрить ViewModelFactory через Dagger, а затем использовать ее с
+    // ViewModelProvider для получения ViewModel.
+    @Inject
+    lateinit var viewModelFactory: HomeFragmentViewModelFactory
+    lateinit var viewModel: HomeFragmentViewModel
 
     private val binding: FragmentHomeBinding get() = _binding!!
     private var _binding: FragmentHomeBinding? = null
@@ -59,7 +71,6 @@ class HomeFragment : Fragment() {
     private lateinit var pullToRefresh: SwipeRefreshLayout
     private lateinit var mAdapter: SimpleCursorAdapter
 
-    private lateinit var scope: CoroutineScope
 
     // Создадим переменную, куда будем класть нашу БД из ViewModel, чтобы у нас не сломался поиск
     private var filmsDataBase = listOf<Film>()
@@ -76,6 +87,10 @@ class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
+        // Внедрение зависимостей
+        (activity?.applicationContext as App).dagger.inject(this)
+        // Использование ViewModelProvider с внедренной фабрикой.
+        viewModel = ViewModelProvider(this, viewModelFactory).get(HomeFragmentViewModel::class.java)
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         _myIncludeLayoutBinding = MergeHomeScreenContentBinding.bind(binding.root)
         return binding.root
@@ -93,6 +108,7 @@ class HomeFragment : Fragment() {
     }
 
 
+    @SuppressLint("CheckResult")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         AnimationHelper.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 1)
@@ -105,47 +121,35 @@ class HomeFragment : Fragment() {
         initPullToRefresh()
         progress_bar = myIncludeLayoutBinding.progressBar
         //Кладем нашу БД в RV
-        // Мы используем Disptchers.IO, потому как мы и совершаем операции ввода-вывода
-        scope = CoroutineScope(Dispatchers.IO).also { scope ->
-            scope.launch {
-                viewModel.filmsListData.collect {
-                    // поскольку у нас это все возвращается на UI, мы при помощи
-                    // withContext(Dispatchers.Main) возвращаем все в главный поток, в противном
-                    // случае у нас будет ошибка.
-                    withContext(Dispatchers.Main) {
-                        filmsAdapter.addItems(it)
-                        filmsDataBase = it
-                    }
-                }
+        // Это должно быть сделано в фоновом потоке.
+        viewModel.filmsListData
+            // Обеспечивает выполнение запроса к базе данных в фоновом режиме
+            .subscribeOn(Schedulers.io())
+            // Обновление пользовательского интерфейса происходит в основном потоке
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ list ->
+                // Обновляем RecyclerView в основном потоке полученными данными
+                filmsAdapter.addItems(list)
+                filmsDataBase = list
+            }, { error ->
+                // Обработать ошибку, если таковая возникнет во время извлечения данных
+                Log.e("HomeFragment", "Error fetching films", error)
+            })
+        // На UI мы будем получать данные о том, нужно нам показывать Прогресс бар или нет, вот так:
+        viewModel.showProgressBar
+            // Обеспечивает выполнение запроса к базе данных в фоновом режиме
+            .subscribeOn(Schedulers.io())
+            // Обновление пользовательского интерфейса происходит в основном потоке
+            .observeOn(AndroidSchedulers.mainThread()).subscribe {
+                progress_bar.isVisible = it
             }
-            // И на UI уже получать изменения. Мы их будем делать в том же скоупе, но в отдельной Корутине:
-            scope.launch {
-                // Получаем мы значение в цикле, и когда фрагмент не будет показываться на экране,
-                // нам нужно эту Корутину остановить, но поскольку мы все запускаем в одном скоупе,
-                // а мы уже написали логику его завершения в методе, то у нас все схвачено, все
-                // завершится при вызове метода onStop.
-                for (element in viewModel.showProgressBar) {
-                    launch(Dispatchers.Main) {
-                        progress_bar.isVisible = element
-                    }
-                }
-            }
-        }
 
-        // подписываемся  на  ошибку получения данных с сервера
-        viewModel.errorEvent.observe(viewLifecycleOwner) {
-            Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun initPullToRefresh() {
         pullToRefresh = myIncludeLayoutBinding.pullToRefresh
         //Вешаем слушатель, чтобы вызвался pull to refresh
         pullToRefresh.setOnRefreshListener {
-            // Чистим адаптер и базу
-            //Чистим адаптер
-            //filmsDataBase = emptyList()
-            //filmsAdapter. clearItems()
             //Делаем новый запрос фильмов на сервер или в БД
             viewModel.loadMovies(viewModel.currentPage)
             //Убираем крутящееся колечко
@@ -284,7 +288,6 @@ class HomeFragment : Fragment() {
     // переопределенном методе onStop мы наш скоуп отменяем:
     override fun onStop() {
         super.onStop()
-        scope.cancel()
     }
 
 }

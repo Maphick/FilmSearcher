@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import com.makashovadev.filmsearcher.data.DAO.FilmDao
 import com.makashovadev.filmsearcher.data.Entity.Film
 
-@Database(entities = [Film::class], version = 1, exportSchema = true)
+@Database(entities = [Film::class], version = 1, exportSchema = false)
 abstract class FilmsDatabase : RoomDatabase() {
     abstract fun filmDao(): FilmDao
 }

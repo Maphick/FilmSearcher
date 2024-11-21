@@ -1,5 +1,7 @@
 package com.makashovadev.filmsearcher.domain
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.makashovadev.filmsearcher.data.Entity.API
 import com.makashovadev.filmsearcher.data.Entity.Film
@@ -11,7 +13,13 @@ import com.makashovadev.filmsearcher.data.dto.TmdbResultsDto
 import com.makashovadev.filmsearcher.data.settings.PreferenceProvider
 import com.makashovadev.filmsearcher.utils.Converter
 import com.makashovadev.filmsearcher.utils.Converter.convertApiListToDtoListFlow
+import com.makashovadev.filmsearcher.utils.Converter.convertApiListToDtoListObservable
 import com.makashovadev.filmsearcher.viewmodel.HomeFragmentViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,58 +37,65 @@ class Interactor @Inject constructor(
     private val preferences: PreferenceProvider
 ) : InteractorInterface {
 
-    // Здесь нам нужен будет канал и скоуп, в котором мы будем отправлять данные в канал
-    val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    // BehaviorSubject (Cold Observable) — отправляет только последнее значение последовательности
+    // каждому новому подписчику. По сути, ReplaySubject с размером кэша 1.
+    var progressBarState: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
-    // У канала нам важно, чтобы только одно значение было единовременно, поэтому мы его создаем
-    // CONFLATED
-    var progressBarState = Channel<Boolean>(Channel.CONFLATED)
 
-    //В конструктор мы будем передавать коллбэк из вью модели, чтобы реагировать на то, когда фильмы будут получены
-    //и страницу, которую нужно загрузить (это для пагинации)
     override fun getFilmsFromApi(page: Int) {
-
         //Показываем ProgressBar
-        scope.launch {
-            progressBarState.send(true)
-        }
+        progressBarState.onNext(true)
         //Метод getDefaultCategoryFromPreferences() будет получать при каждом запросе нужный нам список фильмов
         retrofitService.getFilms(
-            category = getDefaultCategoryFromPreferences(),
-            API.KEY,
-            "ru-RU",
-            page
+            category = getDefaultCategoryFromPreferences(), API.KEY, "ru-RU", page
         )
+            // Запрос выполняется асинхронно с помощью метода enqueue, который не блокирует основной
+            // поток и передает управление обратно в UI после завершения запроса.
             .enqueue(object : Callback<TmdbResultsDto> {
-
+                @SuppressLint("CheckResult")
                 override fun onResponse(
-                    call: Call<TmdbResultsDto>,
-                    response: Response<TmdbResultsDto>
+                    call: Call<TmdbResultsDto>, response: Response<TmdbResultsDto>
                 ) {
-
-
-                    scope.launch {
-                        val apiList: List<TmdbFilm>? =
-                            response.body()?.tmdbFilms// Получаем список фильмов из API (например, через Retrofit)
-                        // конвертацию ответа от API в DTO-объект
-                        val listFlow = convertApiListToDtoListFlow(apiList)
-
-                        listFlow.collect { list ->
-                            // Теперь у нас есть List<Film> — можно передавать в репозиторий
-                            repo.putToDb(list)  // Кладем фильмы в БД
-                            progressBarState.send(false)  // Выключаем ProgressBar
+                    // конвертацию ответа от API в DTO-объект
+                    if (response.isSuccessful) {
+                        // Продолжать обработку списка только в случае успешного ответа (200 OK)
+                        val list = response.body()?.tmdbFilms
+                        if (list != null) {
+                            // Конвертация данных в список объектов типа Film
+                            val listObservable = Converter.convertApiListToDtoListObservable(list)
+                            listObservable
+                                // Выполнить в фоновом потоке
+                                .subscribeOn(Schedulers.io())
+                                .subscribe({ films ->
+                                    // Вставить фильмы в базу данных
+                                    repo.putToDb(films)
+                                    // Скрыть ProgressBar
+                                    progressBarState.onNext(false)
+                                }, { throwable ->
+                                    // Обработать ошибку, если конвертация или вставка не удалась
+                                    Log.e("Interactor", "Error processing films", throwable)
+                                    // Скрыть ProgressBar
+                                    progressBarState.onNext(false)
+                                })
+                        } else {
+                            // Ответ API пуст
+                            Log.e("Interactor", "API response is empty")
+                            progressBarState.onNext(false)
                         }
+                    } else {
+                        // Обработать неуспешный ответ (например, 404, 500)
+                        Log.e("Interactor", "API call failed with HTTP code: ${response.code()}")
+                        progressBarState.onNext(false)
                     }
                 }
 
                 override fun onFailure(call: Call<TmdbResultsDto>, t: Throwable) {
                     //В случае провала выключаем ProgressBar
-                    scope.launch {
-                        progressBarState.send(false)
-                    }
+                    progressBarState.onNext(false)
                 }
             })
     }
+
 
     //Метод для сохранения настроек
     fun saveDefaultCategoryToPreferences(category: String) {
@@ -101,7 +116,8 @@ class Interactor @Inject constructor(
 
 
     // получить все фильмы из БД:
-    fun getFilmsFromDB(): Flow<List<Film>> = repo.getAllFromDB()
+    //fun getFilmsFromDB(): Flow<List<Film>> = repo.getAllFromDB()
+    fun getFilmsFromDB(): Observable<List<Film>> = repo.getAllFromDB()
 
     // удалить все фильмы из базы
     fun clearFilmsFromDB() = repo.clearAll()

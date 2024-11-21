@@ -84,6 +84,12 @@ dependencies {
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
 
+    // RxJava
+    implementation(libs.rxandroid)
+    implementation(libs.rxjava)
+    implementation(libs.room.rxjava3)
+
+
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.extensions)
     implementation(libs.lifecycle.viewmodel.ktx)

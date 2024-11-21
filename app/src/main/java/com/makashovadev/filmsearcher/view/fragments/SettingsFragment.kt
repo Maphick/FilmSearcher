@@ -7,21 +7,30 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.makashovadev.filmsearcher.App
 import com.makashovadev.filmsearcher.utils.AnimationHelper
 import com.makashovadev.filmsearcher.R
 import com.makashovadev.filmsearcher.databinding.FragmentSettingsBinding
+import com.makashovadev.filmsearcher.viewmodel.HomeFragmentViewModel
 import com.makashovadev.filmsearcher.viewmodel.SettingsFragmentViewModel
+import com.makashovadev.filmsearcher.viewmodel.SettingsFragmentViewModelFactory
+import jakarta.inject.Inject
 
 class SettingsFragment : Fragment() {
     private lateinit var binding: FragmentSettingsBinding
-    private val viewModel by lazy {
-        ViewModelProvider.NewInstanceFactory().create(SettingsFragmentViewModel::class.java)
-    }
+    @Inject
+    lateinit var viewModelFactory: SettingsFragmentViewModelFactory
+    lateinit var viewModel: SettingsFragmentViewModel
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // Внедрение зависимостей
+        (activity?.applicationContext as App).dagger.inject(this)
+        // Использование ViewModelProvider с внедренной фабрикой.
+        viewModel = ViewModelProvider(this, viewModelFactory).get(SettingsFragmentViewModel::class.java)
         binding = FragmentSettingsBinding.inflate(layoutInflater, container, false)
         return binding.root
     }

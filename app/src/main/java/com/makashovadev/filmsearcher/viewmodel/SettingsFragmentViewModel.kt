@@ -6,14 +6,15 @@ import com.makashovadev.filmsearcher.App
 import com.makashovadev.filmsearcher.domain.Interactor
 import jakarta.inject.Inject
 
-class SettingsFragmentViewModel : ViewModel() {
-    //Инжектим интерактор
-    @Inject
-    lateinit var interactor: Interactor
+class SettingsFragmentViewModel
+    @Inject constructor(
+        // Инжектим интерактор
+    private val interactor: Interactor
+) : ViewModel() {
+
     val categoryPropertyLifeData: MutableLiveData<String> = MutableLiveData()
 
     init {
-        App.instance.dagger.inject(this)
         //Получаем категорию при инициализации, чтобы у нас сразу подтягивалась категория
         getCategoryProperty()
     }
