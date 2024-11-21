@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,13 +28,23 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import com.makashovadev.filmsearcher.App
 import com.makashovadev.filmsearcher.BuildConfig
 import com.makashovadev.filmsearcher.R
 import com.makashovadev.filmsearcher.data.Entity.ApiConstants
 import com.makashovadev.filmsearcher.data.Entity.Film
 import com.makashovadev.filmsearcher.databinding.FragmentDetailsBinding
 import com.makashovadev.filmsearcher.viewmodel.DetailsFragmentViewModel
+import com.makashovadev.filmsearcher.viewmodel.DetailsFragmentViewModelFactory
+import com.makashovadev.filmsearcher.viewmodel.SettingsFragmentViewModel
+import com.makashovadev.filmsearcher.viewmodel.SettingsFragmentViewModelFactory
 import com.makashovadev.filmsearcher.viewmodel.SingleLiveEvent
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.observers.DisposableSingleObserver
+import io.reactivex.rxjava3.schedulers.Schedulers
+import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -41,6 +52,11 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class DetailsFragment : Fragment() {
+    private val compositeDisposable = CompositeDisposable()
+    // Ссфлки на View и других свойств
+    @Inject
+    lateinit var viewModelFactory: DetailsFragmentViewModelFactory
+    lateinit var viewModel: DetailsFragmentViewModel
     private lateinit var detailsBinding: FragmentDetailsBinding
     private lateinit var details_toolbar: Toolbar
     private lateinit var details_poster: ImageView
@@ -48,63 +64,79 @@ class DetailsFragment : Fragment() {
     private lateinit var details_fab_favorites: FloatingActionButton
     private lateinit var details_fab_share: FloatingActionButton
     private lateinit var details_fab_download: FloatingActionButton
-
     private lateinit var progressBar: ProgressBar
-
     private lateinit var currentFilm: Film
-
-    private val viewModel by lazy {
-        ViewModelProvider.NewInstanceFactory().create(DetailsFragmentViewModel::class.java)
-    }
 
     // скоуп для нашей Корутины с загрузкой постера:
     private val scope = CoroutineScope(Dispatchers.IO)
 
 
     // загрузка постера
+    // Выполнить асинхронную загрузку постера с помощью RxJava
     private fun performAsyncLoadOfPoster() {
-        //Проверяем есть ли разрешение
+        // Сначала проверьте разрешения
         if (!checkPermission()) {
-            //Если нет, то запрашиваем и выходим из метода
             requestPermission()
             return
         }
-        //Создаем родительский скоуп с диспатчером Main потока, так как будем взаимодействовать с UI
-        MainScope().launch {
-            //Включаем Прогресс-бар
-            progressBar.isVisible = true
-            //Создаем через async, так как нам нужен результат от работы, то есть Bitmap
-            val job = scope.async {
-                viewModel.loadWallpaper(ApiConstants.IMAGES_URL + "original" + currentFilm.poster)
-            }
-            //Сохраняем в галерею, как только файл загрузится
 
-            job.await()?.let {
-                saveToGallery(it)
-                //Выводим снекбар с кнопкой перейти в галерею
-                Snackbar.make(
-                    detailsBinding.root,
-                    R.string.downloaded_to_gallery,
-                    Snackbar.LENGTH_LONG
-                )
-                    .setAction(R.string.open) {
-                        val intent = Intent()
-                        intent.action = Intent.ACTION_VIEW
-                        intent.type = "image/*"
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        startActivity(intent)
-                    }
-                    .show()
-            }
+        // Показывать индикатор выполнения во время загрузки изображения
+        progressBar.isVisible = true
 
-            //Отключаем Прогресс-бар
-            progressBar.isVisible = false
-        }
+        // Использование RxJava Single для загрузки постера
+        val loadWallpaperSingle: Single<Bitmap> = viewModel.loadWallpaper(ApiConstants.IMAGES_URL + "original" + currentFilm.poster)
+
+        // Подписаться на Single, чтобы выполнить асинхронную загрузку изображений.
+        val disposable = loadWallpaperSingle
+            // Выполнить сетевой запрос в потоке ввода-вывода
+            .subscribeOn(Schedulers.io())
+            // Обработка результата в основном потоке
+            .observeOn(AndroidSchedulers.mainThread())
+            // Скрыть индикатор выполнения по завершении
+            .doFinally { progressBar.isVisible = false }
+            .subscribeWith(object : DisposableSingleObserver<Bitmap>() {
+                override fun onSuccess(bitmap: Bitmap) {
+                    // Сохраните изображение в галерее после загрузки
+                    saveToGallery(bitmap)
+                    // Показать Snackbar с кнопкой для открытия галереи
+                    Snackbar.make(
+                        detailsBinding.root,
+                        R.string.downloaded_to_gallery,
+                        Snackbar.LENGTH_LONG
+                    )
+                        .setAction(R.string.open) {
+                            val intent = Intent()
+                            intent.action = Intent.ACTION_VIEW
+                            intent.type = "image/*"
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            startActivity(intent)
+                        }
+                        .show()
+                }
+
+                override fun onError(e: Throwable) {
+                    // Обработать ошибку, если изображение не загружается
+                    showError(e)
+                }
+            })
+
+        // Добавить одноразовый ресурс для управления жизненным циклом подписки
+        compositeDisposable.add(disposable)
     }
+
+    // Метод обработки ошибок
+    private fun showError(e: Throwable) {
+        Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // Внедрение зависимостей
+        (activity?.applicationContext as App).dagger.inject(this)
+        // Использование ViewModelProvider с внедренной фабрикой.
+        viewModel = ViewModelProvider(this, viewModelFactory).get(DetailsFragmentViewModel::class.java)
         var view: View? = Init()
         return view
     }
@@ -223,13 +255,6 @@ class DetailsFragment : Fragment() {
                 intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
                 startActivity(intent)
             }
-
-
-            /*ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(Manifest.permission.MANAGE_EXTERNAL_STORAGE),
-                1
-            )*/
         }
         else {
             ActivityCompat.requestPermissions(
@@ -304,6 +329,11 @@ class DetailsFragment : Fragment() {
        return this.replace("'", "")
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Удаляем подписки RxJava при уничтожении представления
+        compositeDisposable.clear()
+    }
 
 
 }

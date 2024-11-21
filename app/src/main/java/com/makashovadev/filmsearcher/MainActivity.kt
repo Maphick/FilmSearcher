@@ -17,6 +17,7 @@ import com.makashovadev.filmsearcher.view.fragments.SettingsFragment
 import com.makashovadev.filmsearcher.view.fragments.WatchLaterFragment
 import com.makashovadev.filmsearcher.viewmodel.HomeFragmentViewModel
 
+// ʕ •́؈•̀ ₎
 class MainActivity : AppCompatActivity() {
 
     //val mainActivityViewModel : HomeFragmentViewModel by viewModels()

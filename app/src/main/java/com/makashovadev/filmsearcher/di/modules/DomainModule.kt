@@ -6,6 +6,7 @@ import com.makashovadev.filmsearcher.data.Interfaces.InteractorInterface
 import com.makashovadev.filmsearcher.data.Interfaces.TmdbApi
 import com.makashovadev.filmsearcher.data.settings.PreferenceProvider
 import com.makashovadev.filmsearcher.domain.Interactor
+import com.makashovadev.filmsearcher.viewmodel.HomeFragmentViewModelFactory
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -30,6 +31,16 @@ class DomainModule(val context: Context) {
         tmdbApi: TmdbApi,
         preferenceProvider: PreferenceProvider
     ) = Interactor(repo = repository, retrofitService = tmdbApi, preferences = preferenceProvider)
+
+
+    // определить модуль Dagger для предоставления ViewModelFactory и Repository, которые внедряются во
+    // ViewModel.
+    @Singleton
+    @Provides
+    fun provideHomeFragmentViewModelFactory(interactor: Interactor): HomeFragmentViewModelFactory {
+        return HomeFragmentViewModelFactory(interactor)
+    }
+
 
 }
 

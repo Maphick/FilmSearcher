@@ -21,6 +21,8 @@ swiperefreshlayout = "1.1.0"
 room_version = "2.6.1"
 adapters = "3.2.0-alpha11"
 parcelize = "1.9.24"
+rxjava = "3.0.0"
+room-rxjava3 = "2.3.0-alpha02"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,7 +48,9 @@ lifecycle-extensions = { group = "androidx.lifecycle", name = "lifecycle-extensi
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room_version" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room_version" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room_version" }
-
+rxandroid = { group = "io.reactivex.rxjava3", name = "rxandroid", version.ref = "rxjava" }
+rxjava = { group = "io.reactivex.rxjava3", name = "rxjava", version.ref = "rxjava" }
+room-rxjava3 = { group = "androidx.room", name = "room-rxjava3", version.ref = "room-rxjava3" }
 
 androidx-adapters = { group = "androidx.databinding", name = "adapters", version.ref = "adapters" }
 lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }

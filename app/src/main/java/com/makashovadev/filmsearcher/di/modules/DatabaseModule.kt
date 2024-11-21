@@ -7,6 +7,7 @@ import com.makashovadev.filmsearcher.data.Entity.MainRepository
 import com.makashovadev.filmsearcher.data.Interfaces.RepositoryInterface
 import com.makashovadev.filmsearcher.data.db.DatabaseHelper
 import com.makashovadev.filmsearcher.data.db.FilmsDatabase
+import com.makashovadev.filmsearcher.viewmodel.HomeFragmentViewModelFactory
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -25,7 +26,10 @@ class DatabaseModule {
             "film_db"
         ).build().filmDao()
 
-    @Provides
-    @Singleton
-    fun provideRepository(filmDao: FilmDao) = MainRepository(filmDao)
+        @Provides
+        @Singleton
+        fun provideRepository(filmDao: FilmDao): MainRepository{
+            return MainRepository(filmDao) // Provide the repository implementation
+        }
+
 }

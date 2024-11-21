@@ -1,0 +1,21 @@
+package com.makashovadev.filmsearcher.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.makashovadev.filmsearcher.data.Entity.MainRepository
+import com.makashovadev.filmsearcher.data.Interfaces.RepositoryInterface
+import com.makashovadev.filmsearcher.domain.Interactor
+import jakarta.inject.Inject
+
+// Чтобы внедрить ViewModel с помощью Dagger, необходимо создать пользовательский
+// ViewModelProvider.Factory, который делегирует Dagger задачу создания ViewModel.
+class DetailsFragmentViewModelFactory
+@Inject constructor(
+) : ViewModelProvider.Factory{
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(DetailsFragmentViewModel::class.java)) {
+            return DetailsFragmentViewModel() as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}

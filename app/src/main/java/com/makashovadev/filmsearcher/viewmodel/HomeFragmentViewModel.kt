@@ -4,7 +4,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.makashovadev.filmsearcher.App
 import com.makashovadev.filmsearcher.data.Entity.Film
+import com.makashovadev.filmsearcher.data.Entity.MainRepository
+import com.makashovadev.filmsearcher.data.Interfaces.RepositoryInterface
 import com.makashovadev.filmsearcher.domain.Interactor
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -13,7 +17,10 @@ import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 
-class HomeFragmentViewModel(
+// ViewModel принимает некоторые зависимости (repo), которые предоставит Dagger.
+class HomeFragmentViewModel
+@Inject constructor(
+    private val interactor: Interactor
 ) : ViewModel() {
 
     val errorEvent = SingleLiveEvent<String>()
@@ -25,27 +32,19 @@ class HomeFragmentViewModel(
 
 
     // для показа прогресс-бара
-    // когда мы хотим его показывать, кладем true, а когда не хотим — false.
-    // Канал у нас готов, теперь ссылку на него нужно пробросить во View модель:
-    val showProgressBar: Channel<Boolean>
+    // Во вью модель мы прописываем ссылку на наш BehaviourSubject:
+    val showProgressBar: BehaviorSubject<Boolean>
 
     // ʕ•ᴥ•ʔ
-    val filmsListData: Flow<List<Film>>
+    val filmsListData: Observable<List<Film>>
 
     // текущая страница для пагинации
     var currentPage = START_PAGE
-
-    //Инициализируем интерактор
-    @Inject
-    lateinit var interactor: Interactor
 
     // время последнего обновления
     val lastDownloadTimeLifeData: MutableLiveData<Long> = MutableLiveData()
 
     init {
-        //И нам нужно при инициализации самого класса HomeFragmentViewModel вызвать метод inject
-        // на компоненте, передав туда ссылку на наш класс:
-        App.instance.dagger.inject(this)
         // загрузка времени последнего обновления из шаред преференсис
         getLastUpdateTime()
         showProgressBar = interactor.progressBarState
@@ -64,9 +63,6 @@ class HomeFragmentViewModel(
             // Если прошло не более 10 минут с момента последней загрузки
             if (currentTime - (lastDownloadTime ?: 0) <= TimeUnit.MINUTES.toMillis(10)) {
                 // запрос в БД на получения фильмов из кэша в отдельном потоке:
-                // Executors.newSingleThreadExecutor().execute {
-                //filmsListLiveData.postValue(interactor.getFilmsFromDB())
-                //}
             } else {
                 // Если данные не кэшированы или устарели, необходимо извлечь из сети
                 getFilms(page)
@@ -75,16 +71,12 @@ class HomeFragmentViewModel(
             }
         } catch (e: Exception) {
             // Произошла ошибка, загрузка из кэша
-            //Executors.newSingleThreadExecutor().execute {
-            //filmsListLiveData.postValue(interactor.getFilmsFromDB())
-            //}
         }
     }
 
 
     //  загрузка страницы по номеру
     fun getFilms(page: Int) {
-        //showProgressBar.postValue(true)
         // появилась сеть
         interactor.getFilmsFromApi(page)
     }
