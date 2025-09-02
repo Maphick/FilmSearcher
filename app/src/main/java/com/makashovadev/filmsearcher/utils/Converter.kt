@@ -9,15 +9,20 @@ import com.makashovadev.filmsearcher.data.dto.TmdbFilm
 object Converter {
     fun convertApiListToDtoList(list: List<TmdbFilm>?): List<Film> {
         val result = mutableListOf<Film>()
-        list?.forEach {
+        list?.forEach { tmdbFilm ->
+            // Проверяем на null все обязательные поля
+            val title = tmdbFilm.title ?: "Unknown Title"
+            val poster = tmdbFilm.posterPath ?: ""
+            val overview = tmdbFilm.overview ?: "No description available"
+
             result.add(
                 Film(
-                title = it.title,
-                poster = it.posterPath,
-                description = it.overview,
-                rating = it.voteAverage,
-                isInFavorites = false
-            )
+                    title = title,
+                    poster = poster,
+                    description = overview,
+                    rating = tmdbFilm.voteAverage,
+                    isInFavorites = false
+                )
             )
         }
         return result
